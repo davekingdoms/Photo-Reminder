@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout3"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterFragment" >
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/materialToolbar"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Photo Reminder" />
+
+    <EditText
+        android:id="@+id/nameRegisterEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/textDialog"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="@string/Username"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:textColorHint="@color/colortexthint"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/materialToolbar"
+        app:layout_constraintVertical_bias="0.165" />
+
+    <EditText
+        android:id="@+id/passwordRegisterEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@color/textDialog"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="@string/Password"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:textColorHint="@color/colortexthint"
+        app:layout_constraintEnd_toEndOf="@+id/nameRegisterEditText"
+        app:layout_constraintStart_toStartOf="@+id/nameRegisterEditText"
+        app:layout_constraintTop_toBottomOf="@+id/nameRegisterEditText" />
+
+    <EditText
+        android:id="@+id/repeatPasswordRegisterEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@color/textDialog"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="@string/Repeat"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:textColorHint="@color/colortexthint"
+        app:layout_constraintEnd_toEndOf="@+id/passwordRegisterEditText"
+        app:layout_constraintStart_toStartOf="@+id/passwordRegisterEditText"
+        app:layout_constraintTop_toBottomOf="@+id/passwordRegisterEditText" />
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="@string/Register"
+        app:layout_constraintEnd_toEndOf="@+id/repeatPasswordRegisterEditText"
+        app:layout_constraintStart_toStartOf="@+id/repeatPasswordRegisterEditText"
+        app:layout_constraintTop_toBottomOf="@+id/repeatPasswordRegisterEditText" />
+</androidx.constraintlayout.widget.ConstraintLayout>

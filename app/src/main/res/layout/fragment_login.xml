@@ -1,14 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginFragment">
+    android:background="@color/colorBackground"
+    tools:context=".LoginFragment" >
 
-    <!-- TODO: Update blank fragment layout -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/LoginMaterialToolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:subtitleTextColor="#FFFFFF"
+        app:title="Photo Reminder"
+        app:titleTextColor="#FFFFFF" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:hint="Password"
+        android:textColorHint="@color/material_dynamic_secondary80"
+        app:hintTextColor="@color/material_dynamic_secondary80"
+        app:layout_constraintEnd_toEndOf="@+id/usernameTextLayout"
+        app:layout_constraintStart_toStartOf="@+id/usernameTextLayout"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextLayout"
+        app:passwordToggleEnabled="true"
+        app:passwordToggleTint="@color/material_dynamic_secondary80">
+
+
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:autofillHints="Pas"
+            android:backgroundTint="@color/textDialog"
+            android:backgroundTintMode="src_over"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:minWidth="50dp"
+            android:textColor="#FFFFFF"
+            android:textColorHighlight="@color/colorOnPrimary"
+            android:textColorHint="@color/material_dynamic_secondary80" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/usernameTextLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Username"
+        android:textColorHint="@color/material_dynamic_secondary80"
+        app:hintTextColor="@color/material_dynamic_secondary80"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/LoginMaterialToolbar"
+        app:layout_constraintVertical_bias="0.19999999">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/usernamEditText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/textDialog"
+            android:backgroundTintMode="screen"
+            android:hint="Username"
+            android:minWidth="200dp"
+            android:textColor="#FFFFFF"
+            android:textColorHighlight="@color/colorOnPrimary"
+            android:textColorHint="@color/material_dynamic_secondary80" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+        app:layout_constraintVertical_bias="0.19999999" />
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/loginTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:textColor="@color/colortexthint"
+        android:textColorHint="@color/material_dynamic_secondary80"
+        app:layout_constraintBottom_toTopOf="@+id/usernameTextLayout"
+        app:layout_constraintEnd_toEndOf="@+id/usernameTextLayout"
+        app:layout_constraintStart_toStartOf="@+id/usernameTextLayout"
+        app:layout_constraintTop_toBottomOf="@+id/LoginMaterialToolbar"
+        app:layout_constraintVertical_bias="0.8" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Click here to register"
+        android:textColor="#FB8C00"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginButton"
+        app:layout_constraintVertical_bias="0.225" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
