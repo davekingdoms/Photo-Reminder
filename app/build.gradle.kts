@@ -16,7 +16,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    buildFeatures {
+        viewBinding = true
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -36,7 +38,12 @@ android {
 }
 
 dependencies {
-
+    implementation (libs.kotlinx.coroutines.core)
+    implementation (libs.kotlinx.coroutines.android)
+    implementation (libs.retrofit2.retrofit)
+    implementation (libs.retrofit2.converter.moshi)
+    implementation (libs.squareup.moshi)
+    implementation (libs.squareup.moshi.kotlin)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
