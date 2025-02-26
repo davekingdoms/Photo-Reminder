@@ -1,5 +1,6 @@
 package com.example.photoreminder.ui.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,15 +19,17 @@ class LoginViewModel : ViewModel() {
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
-    fun doLogin(email: String, password: String) {
+    fun doLogin(username: String, password: String) {
         viewModelScope.launch {
             try {
-                val response = repository.loginUser(email, password)
+                val response = repository.loginUser(username, password)
                 _loginResponse.value = response
 
             }
             catch (e: Exception) {
+                Log.e("LoginViewModel", "Error during login", e)
                 _errorMessage.value = e.message
+
             }
         }
     }

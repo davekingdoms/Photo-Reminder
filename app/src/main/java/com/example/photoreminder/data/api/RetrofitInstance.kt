@@ -1,7 +1,7 @@
 package com.example.photoreminder.data.api
 
 //import com.example.photoreminder.BuildConfig
-import com.example.photoreminder.data.model.AuthResponse
+import android.os.Build
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
@@ -10,7 +10,21 @@ import okhttp3.OkHttpClient
 
 object RetrofitInstance {
 
-    private const val BASE_URL = "http://10.0.2.2:5000/"
+    private const val EMULATOR_IP = "http://10.0.2.2:5000/"
+    private const val SERVER_IP = "http://192.168.1.91:5000"
+
+    private fun isRunningOnEmulator(): Boolean {
+        return (Build.FINGERPRINT.contains("generic")
+                || Build.MODEL.contains("Emulator")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.BRAND.contains("google") && Build.DEVICE.startsWith("generic")
+                || Build.PRODUCT.contains("sdk_gphone")
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.BOARD.contains("goldfish"))
+    }
+
+    private val BASE_URL = if (isRunningOnEmulator()) EMULATOR_IP else SERVER_IP
 
     private val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())

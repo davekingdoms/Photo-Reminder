@@ -3,19 +3,23 @@ package com.example.photoreminder
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.photoreminder.data.datastore.DataStoreManager
 import com.example.photoreminder.databinding.FragmentLoginBinding
 import com.example.photoreminder.ui.login.LoginViewModel
-import androidx.fragment.app.viewModels
-
+import kotlinx.coroutines.launch
 
 
 class LoginFragment : Fragment() {
+
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
@@ -28,10 +32,9 @@ class LoginFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentLoginBinding.inflate(inflater, container,false)
-        val view = binding.root
-        return view
+    ): View {
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,51 +52,49 @@ class LoginFragment : Fragment() {
                 val password = binding.passwordEditText.text.toString()
                 binding.loginButton.isEnabled = username.isNotEmpty() && password.isNotEmpty()
             }
-
             override fun afterTextChanged(s: Editable?) {}
         }
         binding.usernamEditText.addTextChangedListener(textWatcher)
         binding.passwordEditText.addTextChangedListener(textWatcher)
 
         binding.loginButton.setOnClickListener {
-            val email = binding.usernamEditText.text.toString().trim()
+            val username = binding.usernamEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
-            loginViewModel.doLogin(email, password)
+            loginViewModel.doLogin(username, password)
+        }
+
+        loginViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Toast.makeText(requireContext(), "Network error: $it", Toast.LENGTH_LONG).show()
+                loginViewModel.clearLoginResponse()
+            }
         }
 
         loginViewModel.loginResponse.observe(viewLifecycleOwner) { response ->
             response?.let {
                 if (it.isSuccessful) {
-
                     val authResponse = it.body()
                     val token = authResponse?.token
-                    val message = authResponse?.message
 
-                    Toast.makeText(
-                        requireContext(),
-                        "Login success. Token: $token",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        if (token != null) {
+                            DataStoreManager.saveToken(requireContext(), token)
+                            Log.d("TOKEN", "Token: $token")
+                            findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                            loginViewModel.clearLoginResponse()
+                        }
+                    }
 
-                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-                    loginViewModel.clearLoginResponse()
+
 
                 } else {
                     val errorBody = it.errorBody()?.string()
-                    Toast.makeText(requireContext(), "Login error: $errorBody", Toast.LENGTH_LONG)
-                        .show()
-                }
-
-                loginViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
-                    error?.let {
-                        Toast.makeText(requireContext(), "Network error: $it", Toast.LENGTH_LONG).show()
-                        loginViewModel.clearLoginResponse()
-                    }
+                    Toast.makeText(requireContext(), "Login error: $errorBody", Toast.LENGTH_LONG).show()
                 }
             }
-
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

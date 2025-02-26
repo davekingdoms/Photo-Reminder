@@ -1,5 +1,6 @@
 package com.example.photoreminder.ui.register
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,6 +26,7 @@ class RegisterViewModel : ViewModel() {
                 val response = repository.registerUser(username, password)
                 _registerResponse.value = response
             } catch (e: Exception) {
+                Log.e("RegisterViewModel", "Error during registration", e)
                 _errorMessage.value = e.message
             }
         }

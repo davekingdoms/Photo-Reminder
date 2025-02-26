@@ -1,15 +1,19 @@
 package com.example.photoreminder
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.photoreminder.data.datastore.DataStoreManager
 import com.example.photoreminder.databinding.FragmentRegisterBinding
 import com.example.photoreminder.ui.register.RegisterViewModel
+import kotlinx.coroutines.launch
 
 class RegisterFragment : Fragment() {
 
@@ -42,6 +46,8 @@ class RegisterFragment : Fragment() {
 
             if (password != repeatPassword) {
                 Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT).show()
+                binding.repeatPasswordRegisterEditText.error = "Passwords do not match"
+                binding.repeatPasswordRegisterEditText.requestFocus()
                 return@setOnClickListener
             }
 
@@ -51,13 +57,22 @@ class RegisterFragment : Fragment() {
         registerViewModel.registerResponse.observe(viewLifecycleOwner) { response ->
             response?.let {
                 if (it.isSuccessful) {
-                    val body = it.body()
-                    val msg = body?.message
-                    Toast.makeText(requireContext(), "Registered! $msg", Toast.LENGTH_SHORT).show()
+                    val authResponse = it.body()
+                    val msg = authResponse?.message
+                    val token = authResponse?.token
 
-                    findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        if (token != null) {
+                            DataStoreManager.saveToken(requireContext(), token)
+                            Log.d("TOKEN", "Token: $token")
+                            findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                            Toast.makeText(requireContext(), "Registered! $msg", Toast.LENGTH_SHORT).show()
+                            registerViewModel.clearRegisterResponse()
+                        }
+                    }
 
-                    registerViewModel.clearRegisterResponse()
+
+
                 } else {
                     val errorBody = it.errorBody()?.string()
                     Toast.makeText(requireContext(), "Register error: $errorBody", Toast.LENGTH_LONG).show()
