@@ -4,6 +4,7 @@
     <color name="colorPrimary">#105364</color>
     <color name="colorAccent">#105364</color>
     <color name="colorPrimaryDark">#093845</color>
+    <color name="colorOrange">#784307</color>
 
     <!-- Colore testo -->
     <color name="colorOnPrimary">#FFFFFF</color>
