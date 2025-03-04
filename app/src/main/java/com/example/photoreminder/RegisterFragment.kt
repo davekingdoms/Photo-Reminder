@@ -69,6 +69,9 @@ class RegisterFragment : Fragment() {
                             Toast.makeText(requireContext(), "Registered! $msg", Toast.LENGTH_SHORT).show()
                             registerViewModel.clearRegisterResponse()
                         }
+                        else {
+                            Log.d("TOKEN", "null")
+                        }
                     }
 
 
