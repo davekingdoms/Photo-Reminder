@@ -1,8 +1,8 @@
 package com.example.photoreminder
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.example.photoreminder.data.datastore.DataStoreManager
@@ -20,20 +20,21 @@ class MainActivity : AppCompatActivity() {
         // Ma DataStore è asincrono -> facciamo un "launch"
         lifecycleScope.launch {
             val token = DataStoreManager.getToken(this@MainActivity)
-            Log.d("TOKEN", "Token: $token")
-            setContentView(R.layout.activity_main)
+            Log.d("TOKEN", token.toString())
+
             val navController = findNavController(R.id.fragmentContainerView)
             val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
 
-            if (token != null) {
-                // Se abbiamo un token, vai direttamente a HomeFragment
-               navGraph.setStartDestination(R.id.homeFragment)
-            } else {
-                // Altrimenti resta su login
-                navGraph.setStartDestination(R.id.loginFragment)
-            }
+            navGraph.setStartDestination(
+                if (token != null) {
+                    R.id.homeFragment
+                } else {
+                    R.id.loginFragment
+                }
+            )
 
             navController.graph = navGraph
         }
+        setContentView(R.layout.activity_main)
     }
 }

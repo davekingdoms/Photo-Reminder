@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.photoreminder.data.datastore.DataStoreManager
 import com.example.photoreminder.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class HomeFragment : Fragment() {
 
@@ -31,13 +32,13 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.logoutButton.setOnClickListener{
-            viewLifecycleOwner.lifecycleScope.launch {
+        binding.logoutButton.setOnClickListener {
+            runBlocking {
                 DataStoreManager.clearToken(requireContext())
-                findNavController().popBackStack(R.id.loginFragment, false)
-
             }
+            findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
         }
+
     }
 
 }
