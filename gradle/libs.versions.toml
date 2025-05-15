@@ -13,6 +13,7 @@ activity = "1.10.0"
 constraintlayout = "2.2.0"
 navigationFragmentKtx = "2.8.6"
 navigationUiKtx = "2.8.6"
+places = "3.4.0"
 playServicesMaps = "19.0.0"
 retrofitVersion = "2.9.0"
 secretsGradlePlugin = "2.0.1"
@@ -32,6 +33,7 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 retrofit2-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofitVersion" }
 retrofit2-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }

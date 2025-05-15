@@ -9,7 +9,7 @@
     tools:context=".MapsFragment" >
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/materialToolbar4"
+        android:id="@+id/mapMaterialToolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
@@ -17,7 +17,9 @@
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:title="Photo Map" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -27,12 +29,13 @@
         android:scrollbars="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/materialToolbar4" />
+        app:layout_constraintTop_toBottomOf="@+id/mapMaterialToolbar" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="4dp"
+        android:backgroundTint="@color/colorBackground"
         app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,10 +43,115 @@
         app:layout_constraintTop_toBottomOf="@+id/recyclerView"
         app:layout_constraintVertical_bias="0.487">
 
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/mapView"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:backgroundTint="@color/colorBackground"
+                app:cardCornerRadius="40dp"
+                app:layout_constraintBottom_toBottomOf="@+id/mapView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.00999999">
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/autocompleteContainer"
+                    android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </androidx.cardview.widget.CardView>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/currentLocationFAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foregroundTint="@color/colorOnPrimary"
+                android:src="@drawable/gps_svgrepo_com"
+                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTintMode="add"
+                app:layout_constraintBottom_toBottomOf="@+id/mapView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.97"
+                app:layout_constraintStart_toStartOf="@+id/mapView"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.98"
+                app:tint="@color/colorOnPrimary" />
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/mapTypeFAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:foregroundTint="@color/colorOnPrimary"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:src="@drawable/layer_basemap_svgrepo_com"
+                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTintMode="add"
+                app:layout_constraintBottom_toTopOf="@+id/currentLocationFAB"
+                app:layout_constraintEnd_toEndOf="@+id/currentLocationFAB"
+                app:layout_constraintStart_toStartOf="@+id/currentLocationFAB"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                app:tint="@color/colorOnPrimary" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/compassFAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foregroundTint="@color/colorOnPrimary"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:src="@drawable/compass_svgrepo_com"
+                android:tintMode="multiply"
+                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTintMode="add"
+                app:layout_constraintBottom_toTopOf="@+id/mapTypeFAB"
+                app:layout_constraintEnd_toEndOf="@+id/mapTypeFAB"
+                app:layout_constraintStart_toStartOf="@+id/mapTypeFAB"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                app:tint="#FFFFFF" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/threeDimensionFAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foregroundTint="@color/colorOnPrimary"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:src="@drawable/cube_alt_2_svgrepo_com"
+                android:visibility="visible"
+                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTintMode="add"
+                app:layout_constraintBottom_toTopOf="@+id/compassFAB"
+                app:layout_constraintEnd_toEndOf="@+id/compassFAB"
+                app:layout_constraintStart_toStartOf="@+id/compassFAB"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                app:tint="@color/colorOnPrimary" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

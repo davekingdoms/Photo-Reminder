@@ -38,7 +38,7 @@ class RegisterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
+        binding.registerMaterialToolbar.setNavigationOnClickListener{findNavController().navigateUp()}
         binding.registerButton.setOnClickListener {
             val email = binding.nameRegisterEditText.text.toString().trim()
             val password = binding.passwordRegisterEditText.text.toString().trim()
