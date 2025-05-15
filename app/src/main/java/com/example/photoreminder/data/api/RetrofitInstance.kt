@@ -11,7 +11,7 @@ import okhttp3.OkHttpClient
 object RetrofitInstance {
 
     private const val EMULATOR_IP = "http://10.0.2.2:5000/"
-    private const val SERVER_IP = "http://192.168.1.75:5000"
+    private const val SERVER_IP = "http://192.168.1.91:5000"
 
     private fun isRunningOnEmulator(): Boolean {
         return (Build.FINGERPRINT.contains("generic")

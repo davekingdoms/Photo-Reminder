@@ -21,7 +21,7 @@
         app:title="Photo Reminder" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView2"
+        android:id="@+id/cardViewMap"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:backgroundTint="@color/colorPrimary"
@@ -71,10 +71,10 @@
         android:backgroundTint="@color/colorPrimary"
         app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toTopOf="@+id/syncButton"
-        app:layout_constraintEnd_toEndOf="@+id/cardView2"
+        app:layout_constraintEnd_toEndOf="@+id/cardViewMap"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/cardView2"
-        app:layout_constraintTop_toBottomOf="@+id/cardView2">
+        app:layout_constraintStart_toStartOf="@+id/cardViewMap"
+        app:layout_constraintTop_toBottomOf="@+id/cardViewMap">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
