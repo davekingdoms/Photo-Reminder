@@ -47,26 +47,41 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/usernameTextLayout"
                 android:layout_width="0dp"
-                android:layout_height="55dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
-                android:backgroundTint="@color/colorBackground"
-                app:cardCornerRadius="40dp"
-                app:layout_constraintBottom_toBottomOf="@+id/mapView"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+
+                android:textColorHint="@color/material_dynamic_secondary80"
+                android:translationZ="2dp"
+                app:boxBackgroundColor="@color/textDialog"
+                app:boxCornerRadiusBottomEnd="30dp"
+                app:boxCornerRadiusBottomStart="30dp"
+                app:boxCornerRadiusTopEnd="30dp"
+                app:boxCornerRadiusTopStart="30dp"
+                app:boxStrokeColor="@color/colorPrimary"
+                app:boxStrokeWidth="2dp"
+                app:hintTextColor="@color/material_dynamic_secondary80"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.00999999">
+                app:layout_constraintTop_toTopOf="@+id/mapView"
+                app:startIconTint="@color/colorOnPrimary">
 
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/autocompleteContainer"
-                    android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/placesEditText"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </androidx.cardview.widget.CardView>
+                    android:layout_height="match_parent"
+                    android:drawableLeft="@drawable/quantum_ic_search_grey600_24"
+                    android:drawableTint="@color/colorOnPrimary"
+                    android:hint="Search for a place"
+                    android:minWidth="200dp"
+                    android:paddingStart="25dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHighlight="@color/colorOnPrimary"
+                    android:textColorHint="@color/material_dynamic_secondary80" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/currentLocationFAB"
