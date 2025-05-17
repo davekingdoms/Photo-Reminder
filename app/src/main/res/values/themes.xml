@@ -15,4 +15,9 @@
     </style>
 
     <style name="Theme.PhotoReminder" parent="Base.Theme.PhotoReminder" />
+    <style name="PlacesAutocompleteTheme">
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorHint">@color/white</item>
+        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.FilledBox</item>
+    </style>
 </resources>
