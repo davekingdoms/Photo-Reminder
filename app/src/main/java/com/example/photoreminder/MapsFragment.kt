@@ -179,6 +179,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 .build()
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(northBearing))
         }
+
+        googleMap.setOnMapLongClickListener {
+            val action = MapsFragmentDirections.actionMapsFragmentToAddPhotoMarkerFragment(it.latitude.toFloat(), it.longitude.toFloat())
+            findNavController().navigate(action)
+        }
     }
 
     private val requestPermissionLauncher =

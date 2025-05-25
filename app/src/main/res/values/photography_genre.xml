@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="photography_genre">
+        <item>Street</item>
+        <item>Drone</item>
+        <item>Landscape</item>
+        <item>Seascape</item>
+        <item>Cityscape</item>
+        <item>Woodland</item>
+        <item>Astro</item>
+        <item>Star trail</item>
+    </string-array>
+
+</resources>

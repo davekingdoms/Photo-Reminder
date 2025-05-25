@@ -1,7 +1,7 @@
 [versions]
 agp = "8.8.0"
 datastorePreferences = "1.1.2"
-kotlin = "1.9.24"
+kotlin = "2.1.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -12,16 +12,20 @@ material = "1.12.0"
 activity = "1.10.0"
 constraintlayout = "2.2.0"
 navigationFragmentKtx = "2.8.6"
+navigationSafeArgsGradlePlugin = "2.9.0"
 navigationUiKtx = "2.8.6"
-places = "3.4.0"
-playServicesMaps = "19.0.0"
+places = "4.2.0"
+playServicesMaps = "19.2.0"
 retrofitVersion = "2.9.0"
 secretsGradlePlugin = "2.0.1"
 squareupMoshi = "1.14.0"
+room = "2.7.1"
+ksp = "2.1.0-1.0.28"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePlugin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -40,8 +44,11 @@ retrofit2-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref =
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 squareup-moshi = { module = "com.squareup.moshi:moshi", version.ref = "squareupMoshi" }
 squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "squareupMoshi" }
+androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "room" }
+androidx-room-compiler-ksp  = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
