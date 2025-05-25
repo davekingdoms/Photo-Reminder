@@ -62,7 +62,7 @@ class LoginFragment : Fragment() {
             val password = binding.passwordEditText.text.toString().trim()
             loginViewModel.doLogin(username, password)
         }
-
+ 
         loginViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), "Network error: $it", Toast.LENGTH_LONG).show()

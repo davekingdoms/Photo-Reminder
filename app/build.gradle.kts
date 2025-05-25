@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("androidx.navigation.safeargs.kotlin")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -22,14 +24,7 @@ android {
         buildConfig = true
     }
     secrets {
-        // To add your Maps API key to this project:
-        // 1. If the secrets.properties file does not exist, create it in the same folder as the local.properties file.
-        // 2. Add this line, where YOUR_API_KEY is your API key:
-        //        MAPS_API_KEY=YOUR_API_KEY
         propertiesFileName = "secrets.properties"
-
-        // A properties file containing default secret values. This file can be
-        // checked in version control.
         defaultPropertiesFileName = "local.default.properties"
     }
     buildTypes {
@@ -65,6 +60,16 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+
+    // Room dependencies
+
+    implementation(libs.androidx.room.runtime.android)
+    ksp(libs.androidx.room.compiler.ksp)
+
+     implementation(libs.androidx.room.ktx)
+
+
+    implementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     implementation(libs.places)
     androidTestImplementation(libs.androidx.junit)
