@@ -6,46 +6,35 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-
 
 object DataStoreManager {
 
-    private val TOKEN_KEY = stringPreferencesKey("auth_token")
+    /* ──────── CHIAVI ──────── */
+    private val TOKEN_KEY     = stringPreferencesKey("auth_token")
+    private val USERNAME_KEY  = stringPreferencesKey("username")   // << was: user_id
 
-    // 1) Estensione per creare DataStore
-    //    "val Context.dataStore by preferencesDataStore(name = "my_datastore")"
-    //    Non possiamo inserirla direttamente qui (in un object), va fuori da un object/classe.
-    //    Quindi la definiamo sotto.
-
-    /**
-     * Salva il token in DataStore in modo asincrono.
-     */
+    /* ──────── TOKEN ──────── */
     suspend fun saveToken(context: Context, token: String) {
-        context.dataStore.edit { prefs ->
-            prefs[TOKEN_KEY] = token
-        }
+        context.dataStore.edit { it[TOKEN_KEY] = token }
     }
+    suspend fun getToken(context: Context): String? =
+        context.dataStore.data.first()[TOKEN_KEY]
 
-    /**
-     * Restituisce il token, oppure null se non presente.
-     */
-    suspend fun getToken(context: Context): String? {
-        // dataStore.data è un Flow<Preferences>
-        // con "first()" otteniamo il primo (e unico) valore
-        // (in un'app reale, potresti preferire un Flow continuo)
-        val prefs = context.dataStore.data.first()
-        return prefs[TOKEN_KEY]
-    }
-
-    /**
-     * Rimuove il token (logout).
-     */
     suspend fun clearToken(context: Context) {
-        context.dataStore.edit { prefs ->
-            prefs.remove(TOKEN_KEY)
-        }
+        context.dataStore.edit { it.remove(TOKEN_KEY) }
+    }
+
+    /* ──────── USERNAME ──────── */
+    suspend fun saveUsername(context: Context, username: String) {
+        context.dataStore.edit { it[USERNAME_KEY] = username }
+    }
+    suspend fun getUsername(context: Context): String? =
+        context.dataStore.data.first()[USERNAME_KEY]
+
+    suspend fun clearUsername(context: Context) {
+        context.dataStore.edit { it.remove(USERNAME_KEY) }
     }
 }
 
+/* Extension DataStore */
 val Context.dataStore by preferencesDataStore(name = "my_datastore")

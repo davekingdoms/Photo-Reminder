@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -19,23 +21,34 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.photoreminder.data.local.MarkerDatabase
+import com.example.photoreminder.data.repository.MarkerRepository
 import com.example.photoreminder.databinding.FragmentMapsBinding
+import com.example.photoreminder.ui.viewmodel.MarkerViewModel
+import com.example.photoreminder.ui.viewmodel.MarkerViewModelFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import java.util.Locale
+import kotlin.math.roundToInt
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
@@ -48,6 +61,15 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private enum class LocationMode { LAST_KNOWN, CURRENT_BALANCED, CURRENT_HIGH }
     private val fineLocation = Manifest.permission.ACCESS_FINE_LOCATION
+
+    private val viewModel: MarkerViewModel by viewModels {
+        MarkerViewModelFactory(
+            MarkerRepository(
+                MarkerDatabase.getDatabase(requireContext()).markerDao()
+            )
+        )
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -69,15 +91,15 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         binding.mapView.onCreate(savedInstanceState)
         binding.mapView.getMapAsync(this)
 
-        // Nascondi inizialmente il FAB 3D
+        // Initially hide the 3D FAB
         binding.threeDimensionFAB.visibility = View.INVISIBLE
 
-        // Navigazione up sulla toolbar
+        // Navigation up on toolbar
         binding.mapMaterialToolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 
-        // Registrazione dell’ActivityResultLauncher per l’Autocomplete
+        // Register Autocomplete launcher
         searchLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -99,13 +121,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 val status = Autocomplete.getStatusFromIntent(result.data!!)
                 Toast.makeText(
                     requireContext(),
-                    "Errore Autocomplete: ${status.statusMessage}",
+                    "Autocomplete error: ${status.statusMessage}",
                     Toast.LENGTH_LONG
                 ).show()
             }
         }
 
-        // Rendi l’EditText non editabile e apri l’intent al click
+        // Make EditText non-editable and launch Autocomplete on click
         binding.placesEditText.apply {
             isFocusable = false
             isClickable = true
@@ -183,6 +205,21 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         googleMap.setOnMapLongClickListener {
             val action = MapsFragmentDirections.actionMapsFragmentToAddPhotoMarkerFragment(it.latitude.toFloat(), it.longitude.toFloat())
             findNavController().navigate(action)
+        }
+
+        viewModel.markers.observe(viewLifecycleOwner) { list ->
+
+            googleMap.clear()
+
+            list.forEach { m ->
+                googleMap.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(m.lat, m.lng))
+                        .title(m.title)
+                        .icon(getIconForGenre(m.genre))
+                        .anchor(0.5f, 1f)
+                )
+            }
         }
     }
 
@@ -266,6 +303,39 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         val unipr = LatLng(44.7651628, 10.3117204)
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(unipr, 17f))
         Toast.makeText(requireContext(), "Position not available", Toast.LENGTH_LONG).show()
+    }
+
+    private fun getIconForGenre(genre: String?): BitmapDescriptor {
+        /* 1) scegli la risorsa in base al genere */
+        val resId = when (genre?.lowercase(Locale.getDefault())) {
+            "street"      -> R.drawable.street_icon
+            "drone"       -> R.drawable.drone_icon
+            "landscape"   -> R.drawable.landscape_icon
+            "seascape"    -> R.drawable.seascape_icon
+            "cityscape"   -> R.drawable.cityscape_icon
+            "woodland"    -> R.drawable.woodland_icon
+            "astro"       -> R.drawable.astro_icon
+            "star trail"  -> R.drawable.star_trail_icon
+            else          -> R.drawable.street_icon          // fallback
+        }
+
+        /* 2) calcola la dimensione target in pixel (48 dp) */
+        val targetPx = (34 * resources.displayMetrics.density).roundToInt()
+
+        /* 3) drawable → bitmap ridimensionato */
+        val drawable = ResourcesCompat.getDrawable(resources, resId, null)!!
+        val rawBmp = Bitmap.createBitmap(
+            drawable.intrinsicWidth,
+            drawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(rawBmp)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+
+        val scaledBmp = Bitmap.createScaledBitmap(rawBmp, targetPx, targetPx, true)
+
+        return BitmapDescriptorFactory.fromBitmap(scaledBmp)
     }
 
     override fun onStart() { super.onStart(); binding.mapView.onStart() }

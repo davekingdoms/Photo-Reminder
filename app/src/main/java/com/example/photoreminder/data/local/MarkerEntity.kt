@@ -8,12 +8,12 @@ import androidx.room.PrimaryKey
     tableName = "markers",
     indices = [
         Index(value = ["syncStatus"]),
-        Index(value = ["userId"])
+        Index(value = ["username"])
     ]
 )
 data class MarkerEntity(
     @PrimaryKey val id: String,
-    val userId: String,
+    val username: String,
     val lat: Double,
     val lng: Double,
     val angle: Float,

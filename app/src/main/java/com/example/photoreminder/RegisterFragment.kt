@@ -60,10 +60,12 @@ class RegisterFragment : Fragment() {
                     val authResponse = it.body()
                     val msg = authResponse?.message
                     val token = authResponse?.token
+                    val username = binding.nameRegisterEditText.text.toString().trim()
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         if (token != null) {
                             DataStoreManager.saveToken(requireContext(), token)
+                            DataStoreManager.saveUsername(requireContext(), username)
                             Log.d("TOKEN", "Token: $token")
                             findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
                             Toast.makeText(requireContext(), "Registered! $msg", Toast.LENGTH_SHORT).show()

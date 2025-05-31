@@ -233,7 +233,7 @@
                         android:textSize="16sp" />
 
                     <EditText
-                        android:id="@+id/focalLenghtEditTextView"
+                        android:id="@+id/focalLengthEditText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="24dp"
@@ -262,7 +262,7 @@
                         android:textSize="16sp" />
 
                     <EditText
-                        android:id="@+id/tagEditTextView"
+                        android:id="@+id/tagEditText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="24dp"
@@ -274,7 +274,7 @@
 
                 <!-- Row 7: Note -->
                 <EditText
-                    android:id="@+id/noteEditTextText"
+                    android:id="@+id/noteEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"

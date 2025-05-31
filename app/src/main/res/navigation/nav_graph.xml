@@ -72,9 +72,6 @@
             android:id="@+id/action_addPhotoMarkerFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
         <action
-            android:id="@+id/action_addPhotoMarkerFragment_to_imageFragment"
-            app:destination="@id/imageFragment" />
-        <action
             android:id="@+id/action_addPhotoMarkerFragment_to_mapsFragment"
             app:destination="@id/mapsFragment" />
     </fragment>
@@ -87,7 +84,11 @@
         android:id="@+id/detailPhotoFragment"
         android:name="com.example.photoreminder.DetailPhotoFragment"
         android:label="fragment_detail_photo"
-        tools:layout="@layout/fragment_detail_photo" />
+        tools:layout="@layout/fragment_detail_photo" >
+        <action
+            android:id="@+id/action_detailPhotoFragment_to_imageFragment"
+            app:destination="@id/imageFragment" />
+    </fragment>
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.example.photoreminder.RegisterFragment"
