@@ -1,5 +1,6 @@
 package com.example.photoreminder
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,7 +13,11 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.photoreminder.data.datastore.DataStoreManager
+import com.example.photoreminder.data.sync.MarkerSyncWorker
 import com.example.photoreminder.databinding.FragmentLoginBinding
 import com.example.photoreminder.ui.login.LoginViewModel
 import kotlinx.coroutines.launch
@@ -62,7 +67,7 @@ class LoginFragment : Fragment() {
             val password = binding.passwordEditText.text.toString().trim()
             loginViewModel.doLogin(username, password)
         }
- 
+
         loginViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), "Network error: $it", Toast.LENGTH_LONG).show()
@@ -75,11 +80,40 @@ class LoginFragment : Fragment() {
                 if (it.isSuccessful) {
                     val authResponse = it.body()
                     val token = authResponse?.token
+                    val username = binding.usernamEditText.text.toString().trim()
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         if (token != null) {
                             DataStoreManager.saveToken(requireContext(), token)
                             Log.d("TOKEN", "Token: $token")
+                            DataStoreManager.saveUsername(requireContext(), username)
+
+                            requireContext()
+                                .getSharedPreferences("marker_sync_prefs", Context.MODE_PRIVATE)
+                                .edit()
+                                .putLong("last_sync_time_${username}", 0L)
+                                .apply()
+
+                            val oneTime = OneTimeWorkRequestBuilder<MarkerSyncWorker>()
+                                .setInputData(workDataOf("isManual" to true))
+                                .build()
+
+                            val wm = WorkManager.getInstance(requireContext())
+                            wm.enqueue(oneTime)
+                            wm.getWorkInfoByIdLiveData(oneTime.id)
+                                .observe(viewLifecycleOwner) { info ->
+                                    info?.let { wi ->
+                                        if (wi.state.isFinished) {
+                                            val msg = wi.outputData.getString("message")
+                                                ?: wi.outputData.getString("errorMessage")
+                                            if (!msg.isNullOrBlank()) {
+                                                Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
+                                            }
+                                        }
+                                    }
+                                }
+
+
                             findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                             loginViewModel.clearLoginResponse()
                         }

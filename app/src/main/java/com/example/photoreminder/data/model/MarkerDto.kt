@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class MarkerDto(
     @Json(name = "_id") val id: String?,
-    val userId: String,
+    val username: String,
     val lat: Double,
     val lng: Double,
     val title: String,

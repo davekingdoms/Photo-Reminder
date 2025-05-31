@@ -2,36 +2,28 @@ package com.example.photoreminder.data.repository
 
 import com.example.photoreminder.data.local.MarkerDao
 import com.example.photoreminder.data.local.MarkerEntity
+import com.example.photoreminder.data.local.SyncStatus
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Repository per la gestione dei marker in locale e per la successiva sincronizzazione.
- */
 class MarkerRepository(
     private val dao: MarkerDao
 ) {
-    /** Flusso di tutti i marker (esclude quelli cancellati) */
-    fun observeAll(): Flow<List<MarkerEntity>> =
-        dao.observeMarkers()
+    /* tutti i marker (la UI filtra quelli deleted) */
+    fun observeAll(): Flow<List<MarkerEntity>> = dao.observeMarkers()
 
-    /** Restituisce i marker pendenti di sincronizzazione (creati, modificati o cancellati) */
-    suspend fun getPendingForSync(): List<MarkerEntity> =
-        dao.getPending()
+    suspend fun getPendingForSync(): List<MarkerEntity> = dao.getPending()
 
-    /** Inserisce o aggiorna un marker in locale */
-    suspend fun upsert(marker: MarkerEntity) =
-        dao.insert(marker)
+    suspend fun upsert(marker: MarkerEntity) = dao.insert(marker)
 
-    /** Marca un marker come cancellato localmente */
-    suspend fun deleteLocal(id: String) =
-        dao.flagDelete(id)
+    suspend fun deleteLocal(id: String) = dao.flagDelete(id)
 
-    /**
-     * In futuro: metodo di sincronizzazione
-     * 1) push delle modifiche locali
-     * 2) pull dei delta dal server
-     */
-    suspend fun sync() {
-        // TODO: implementare push e pull
-    }
+    suspend fun replaceId(oldId: String, newId: String) =
+        dao.replaceId(oldId, newId)
+
+    suspend fun markSynced(id: String) =
+        dao.updateSyncStatus(id, SyncStatus.SYNCED)
+
+    suspend fun remove(id: String) = dao.deleteById(id)
+
+    suspend fun clearAll() = dao.clearAllMarkers()
 }

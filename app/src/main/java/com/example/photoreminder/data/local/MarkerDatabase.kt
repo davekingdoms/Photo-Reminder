@@ -1,4 +1,4 @@
-package com.example.photoreminder.data.local    // stesso package delle altre classi
+package com.example.photoreminder.data.local
 
 import android.content.Context
 import androidx.room.Database
@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [MarkerEntity::class], version = 1, exportSchema = false
+@Database(entities = [MarkerEntity::class], version = 2, exportSchema = false
 )
 @TypeConverters(MarkerConverters::class)
 abstract class MarkerDatabase : RoomDatabase() {
