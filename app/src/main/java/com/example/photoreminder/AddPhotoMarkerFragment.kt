@@ -136,7 +136,7 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
         val aperture       = binding.fStopSpinner.selectedItem as String
         val iso            = binding.isoSpinner.selectedItem as String
         val focalLength    = binding.focalLengthEditText.text.toString().toIntOrNull() ?: 0
-        val tag            = binding.tagEditText.text.toString().takeIf { it.isNotBlank() }
+        val tag            = binding.tagEditText.text.toString().trim().takeIf { it.isNotBlank() }
         val notes          = binding.noteEditText.text.toString().takeIf { it.isNotBlank() }
         val angle          = binding.rotationSlider.value
 
