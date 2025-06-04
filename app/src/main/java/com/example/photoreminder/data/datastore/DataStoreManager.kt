@@ -1,7 +1,6 @@
 package com.example.photoreminder.data.datastore
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -11,7 +10,7 @@ object DataStoreManager {
 
     /* ──────── CHIAVI ──────── */
     private val TOKEN_KEY     = stringPreferencesKey("auth_token")
-    private val USERNAME_KEY  = stringPreferencesKey("username")   // << was: user_id
+    private val USERNAME_KEY  = stringPreferencesKey("username")
 
     /* ──────── TOKEN ──────── */
     suspend fun saveToken(context: Context, token: String) {

@@ -59,8 +59,8 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
         }
 
         latLng = LatLng(args.lat.toDouble(), args.lng.toDouble())
-        binding.mapViewMarkerDetail.onCreate(savedInstanceState)
-        binding.mapViewMarkerDetail.getMapAsync(this)
+        binding.mapViewMarker.onCreate(savedInstanceState)
+        binding.mapViewMarker.getMapAsync(this)
 
         setupSpinners()
 
@@ -222,22 +222,36 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
         binding.rotationSlider.addOnChangeListener { _, value, _ ->
             photoMarker.rotation = value
         }
+
+        binding.mapTypeFAB2.setOnClickListener{
+            if (googleMap.mapType == GoogleMap.MAP_TYPE_NORMAL) {
+                googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
+            } else {
+                googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+            }
+        }
+
+        binding.threeDimensionFAB2.setOnClickListener {
+            googleMap.isBuildingsEnabled = !googleMap.isBuildingsEnabled
+        }
+
+
     }
 
     /* -------------------------- ciclo vita MapView -------------------------- */
-    override fun onStart()  { super.onStart();  binding.mapViewMarkerDetail.onStart() }
-    override fun onResume() { super.onResume(); binding.mapViewMarkerDetail.onResume() }
-    override fun onPause()  { binding.mapViewMarkerDetail.onPause();  super.onPause() }
-    override fun onStop()   { binding.mapViewMarkerDetail.onStop();   super.onStop() }
-    override fun onLowMemory() { super.onLowMemory(); binding.mapViewMarkerDetail.onLowMemory() }
+    override fun onStart()  { super.onStart();  binding.mapViewMarker.onStart() }
+    override fun onResume() { super.onResume(); binding.mapViewMarker.onResume() }
+    override fun onPause()  { binding.mapViewMarker.onPause();  super.onPause() }
+    override fun onStop()   { binding.mapViewMarker.onStop();   super.onStop() }
+    override fun onLowMemory() { super.onLowMemory(); binding.mapViewMarker.onLowMemory() }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        binding.mapViewMarkerDetail.onSaveInstanceState(outState)
+        binding.mapViewMarker.onSaveInstanceState(outState)
     }
 
     override fun onDestroyView() {
-        binding.mapViewMarkerDetail.onDestroy()
+        binding.mapViewMarker.onDestroy()
         _binding = null
         super.onDestroyView()
     }

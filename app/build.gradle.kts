@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.room.runtime.android)
+    implementation(libs.androidx.legacy.support.v4)
     ksp(libs.androidx.room.compiler.ksp)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.espresso.core)

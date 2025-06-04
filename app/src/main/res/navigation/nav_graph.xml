@@ -85,6 +85,10 @@
         android:name="com.example.photoreminder.DetailPhotoFragment"
         android:label="fragment_detail_photo"
         tools:layout="@layout/fragment_detail_photo" >
+
+        <argument
+            android:name="id"
+            app:argType="string" />
         <action
             android:id="@+id/action_detailPhotoFragment_to_imageFragment"
             app:destination="@id/imageFragment" />

@@ -22,6 +22,7 @@ squareupMoshi = "1.14.0"
 room = "2.7.1"
 ksp = "2.1.0-1.0.28"
 workRuntimeKtx = "2.10.1"
+legacySupportV4 = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +50,7 @@ squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.re
 androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "room" }
 androidx-room-compiler-ksp  = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
