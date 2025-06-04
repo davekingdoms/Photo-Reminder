@@ -24,7 +24,7 @@
         app:layout_constraintVertical_bias="0.0"
         app:navigationIcon="?attr/homeAsUpIndicator"
         app:navigationIconTint="@color/white"
-        app:title="Marker Details"
+        app:title="Photo Marker"
         app:titleTextColor="@color/white" />
 
     <androidx.core.widget.NestedScrollView
@@ -339,7 +339,7 @@
             android:layout_height="match_parent">
 
             <com.google.android.gms.maps.MapView
-                android:id="@+id/mapViewMarkerDetail"
+                android:id="@+id/mapViewMarker"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:contentDescription="Visualize marker in map"
@@ -362,11 +362,11 @@
                 android:src="@drawable/layer_basemap_svgrepo_com"
                 app:backgroundTint="@color/colorPrimary"
                 app:backgroundTintMode="add"
-                app:layout_constraintBottom_toBottomOf="@+id/mapViewMarkerDetail"
+                app:layout_constraintBottom_toBottomOf="@+id/mapViewMarker"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.98"
-                app:layout_constraintStart_toStartOf="@+id/mapViewMarkerDetail"
-                app:layout_constraintTop_toTopOf="@+id/mapViewMarkerDetail"
+                app:layout_constraintStart_toStartOf="@+id/mapViewMarker"
+                app:layout_constraintTop_toTopOf="@+id/mapViewMarker"
                 app:layout_constraintVertical_bias="0.98"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
                 app:tint="@color/colorOnPrimary" />
@@ -399,7 +399,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/mapViewMarkerDetail"
+                app:layout_constraintTop_toTopOf="@+id/mapViewMarker"
                 app:layout_constraintVertical_bias="1.0"
                 app:trackColorInactive="#5F7A81" />
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,7 @@ package com.example.photoreminder.ui.viewmodel
 import androidx.lifecycle.*
 import com.example.photoreminder.data.local.MarkerEntity
 import com.example.photoreminder.data.repository.MarkerRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MarkerViewModel(
@@ -26,6 +27,5 @@ class MarkerViewModel(
             repository.deleteLocal(id)
         }
     }
-
 
 }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,18 +14,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
-import com.example.photoreminder.data.datastore.DataStoreManager
 import com.example.photoreminder.data.local.MarkerDatabase
 import com.example.photoreminder.data.local.MarkerEntity
 import com.example.photoreminder.data.local.SyncStatus
 import com.example.photoreminder.data.repository.MarkerRepository
-import com.example.photoreminder.data.sync.MarkerSyncWorker
 import com.example.photoreminder.databinding.FragmentMapsBinding
 import com.example.photoreminder.ui.adapter.TagAdapter
 import com.example.photoreminder.ui.viewmodel.MarkerViewModel
@@ -37,6 +32,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
@@ -44,7 +40,6 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
@@ -97,6 +92,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         // 1) Inizializzo MapView
         binding.mapView.onCreate(savedInstanceState)
         binding.mapView.getMapAsync(this)
+        binding.threeDimensionFAB.visibility = View.INVISIBLE
         binding.mapMaterialToolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -159,7 +155,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
         // 4) Osserva i marker da Room
         viewModel.markers.observe(viewLifecycleOwner) { list ->
-            allMarkers = list
+            allMarkers = list.filterNot { it.syncStatus == SyncStatus.PENDING_DELETE }
 
             // 4a) ricavo tutti i generi e tag unici
             val genres = allMarkers
@@ -195,6 +191,59 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             askLocationPermission()
         }
 
+        googleMap.setOnCameraMoveListener {
+            val bearing = googleMap.cameraPosition.bearing
+            binding.compassFAB.animate().rotation(-bearing).start()
+        }
+
+        binding.currentLocationFAB.setOnClickListener {
+            if (hasLocationPermission()) {
+                enableMyLocation(LocationMode.CURRENT_HIGH)
+            } else {
+                askLocationPermission()
+            }
+        }
+
+        binding.mapTypeFAB.setOnClickListener {
+            if (googleMap.mapType == GoogleMap.MAP_TYPE_NORMAL) {
+                googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
+                binding.threeDimensionFAB.visibility = View.INVISIBLE
+            } else {
+                googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+                binding.threeDimensionFAB.visibility = View.VISIBLE
+            }
+        }
+
+        binding.threeDimensionFAB.setOnClickListener {
+            googleMap.isBuildingsEnabled = !googleMap.isBuildingsEnabled
+        }
+
+        binding.compassFAB.setOnClickListener {
+            val currentCameraPosition = googleMap.cameraPosition
+            val northBearing = CameraPosition.builder()
+                .target(currentCameraPosition.target)
+                .zoom(currentCameraPosition.zoom)
+                .tilt(currentCameraPosition.tilt)
+                .bearing(0f)
+                .build()
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(northBearing))
+        }
+
+        // Imposto il listener di click sui marker una sola volta
+        googleMap.setOnMarkerClickListener { marker ->
+            val markerId = marker.tag as? String
+            if (markerId != null) {
+                Log.d("MapsFragment", "Navigo a DetailPhoto con id = $markerId")
+                val action = MapsFragmentDirections
+                    .actionMapsFragmentToDetailPhotoFragment(markerId)
+                findNavController().navigate(action)
+                true
+            } else {
+                Log.d("MapsFragment", "marker.tag è null, id non assegnato")
+                false
+            }
+        }
+
         // Ascolto long-press per aggiungere un marker (nav a AddPhotoMarkerFragment)
         googleMap.setOnMapLongClickListener {
             val action = MapsFragmentDirections
@@ -204,11 +253,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             findNavController().navigate(action)
         }
 
-        // Traccio i marker già disponibili su allMarkers
+        // Disegno iniziale dei marker (se già presenti)
         drawMarkersOnMap()
     }
 
-    /** Ridisegna i marker filtrati da [selectedTag] */
     private fun drawMarkersOnMap() {
         if (!::googleMap.isInitialized) return
         googleMap.clear()
@@ -224,13 +272,16 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         }
 
         toDraw.forEach { m ->
-            googleMap.addMarker(
+            // Aggiungo il marker e ne catturo l'oggetto per poter assegnare il tag
+            val gmMarker = googleMap.addMarker(
                 MarkerOptions()
                     .position(LatLng(m.lat, m.lng))
                     .title(m.title)
                     .icon(getIconForGenre(m.genre))
                     .anchor(0.5f, 1f)
             )
+            // Assegno l'id dell'entità Room come tag
+            gmMarker?.tag = m.id
         }
     }
 
@@ -369,7 +420,4 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         _binding = null
         super.onDestroyView()
     }
-
-    // Ripetiamo enum LocationMode
-
 }
