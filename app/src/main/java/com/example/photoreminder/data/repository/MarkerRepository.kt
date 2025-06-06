@@ -25,5 +25,9 @@ class MarkerRepository(
 
     suspend fun remove(id: String) = dao.deleteById(id)
 
+    suspend fun updateMarker(marker: MarkerEntity) {
+        dao.update(marker)
+    }
+
     suspend fun clearAll() = dao.clearAllMarkers()
 }

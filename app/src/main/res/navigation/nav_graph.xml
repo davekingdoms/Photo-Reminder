@@ -41,6 +41,12 @@
         android:name="com.example.photoreminder.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" >
+        <argument
+            android:name="centerLat"
+            app:argType="float" />
+        <argument
+            android:name="centerLng"
+            app:argType="float" />
         <action
             android:id="@+id/action_mapsFragment_to_addPhotoMarkerFragment"
             app:destination="@id/addPhotoMarkerFragment" />
@@ -92,6 +98,9 @@
         <action
             android:id="@+id/action_detailPhotoFragment_to_imageFragment"
             app:destination="@id/imageFragment" />
+        <action
+            android:id="@+id/action_detailPhotoFragment_to_editMarkerFragment"
+            app:destination="@id/editMarkerFragment" />
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
@@ -109,4 +118,17 @@
         android:name="com.example.photoreminder.ImageFragment"
         android:label="fragment_image"
         tools:layout="@layout/fragment_image" />
+    <fragment
+        android:id="@+id/editMarkerFragment"
+        android:name="com.example.photoreminder.EditMarkerFragment"
+        android:label="fragment_edit_marker"
+        tools:layout="@layout/fragment_edit_marker" >
+        <argument
+            android:name="markerId"
+            app:argType="string"
+            />
+        <action
+            android:id="@+id/action_editMarkerFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+    </fragment>
 </navigation>

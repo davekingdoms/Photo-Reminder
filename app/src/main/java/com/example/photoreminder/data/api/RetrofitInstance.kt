@@ -13,15 +13,13 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 object RetrofitInstance {
 
-    // ───────── inizializzazione lazy con Context ─────────
     private lateinit var appContext: Context
     fun init(context: Context) {            // chiama da Application.onCreate()
         appContext = context.applicationContext
     }
 
-    // ───────── base URL ─────────
     private const val EMULATOR_IP = "http://10.0.2.2:5000/"
-    private const val SERVER_IP   = "http://192.168.1.2:5000/"
+    private const val SERVER_IP   = "http://192.168.1.91:5000/"
     private val BASE_URL = if (
         Build.FINGERPRINT.contains("generic")    || Build.MODEL.contains("Emulator") ||
         Build.MANUFACTURER.contains("Genymotion")|| Build.BRAND.contains("google") && Build.DEVICE.startsWith("generic") ||
@@ -29,12 +27,10 @@ object RetrofitInstance {
         Build.HARDWARE.contains("ranchu")        || Build.BOARD.contains("goldfish")
     ) EMULATOR_IP else SERVER_IP
 
-    // ───────── Moshi ─────────
     private val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
 
-    // ───────── Interceptor che aggiunge Bearer ─────────
     private val authInterceptor = Interceptor { chain ->
         val token = runBlocking { DataStoreManager.getToken(appContext) }
         val req = chain.request().newBuilder()
@@ -44,7 +40,6 @@ object RetrofitInstance {
         chain.proceed(req.build())
     }
 
-    // ───────── OkHttp + Retrofit ─────────
     private val okHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(authInterceptor)

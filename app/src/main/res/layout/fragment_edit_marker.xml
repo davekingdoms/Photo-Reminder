@@ -2,14 +2,16 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout5"
+    android:id="@+id/frameLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
-    tools:context=".DetailPhotoFragment">
+    android:background="@color/material_dynamic_neutral_variant30"
+    android:scrollbarSize="6dp"
+    app:circularflow_radiusInDP="20"
+    tools:context=".EditMarkerFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/detailPhotoMarkerToolBar"
+        android:id="@+id/EditMarkerToolBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -22,83 +24,29 @@
         app:layout_constraintVertical_bias="0.0"
         app:navigationIcon="?attr/homeAsUpIndicator"
         app:navigationIconTint="@color/white"
-        app:title="Marker Details"
+        app:title="Photo Marker"
         app:titleTextColor="@color/white" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/CardMapView"
-        android:layout_width="0dp"
-        android:layout_height="250dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:background="@color/colorPrimary"
-        android:backgroundTint="@color/colorPrimary"
-        app:cardBackgroundColor="@color/colorPrimary"
-        app:cardCornerRadius="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detailPhotoMarkerToolBar">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/markerDetailMapView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:contentDescription="Visualize marker in map"
-                app:circularflow_radiusInDP="20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-
-    <Button
-        android:id="@+id/deleteButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="Delete"
-        app:icon="@android:drawable/ic_menu_delete"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/editButton"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/editButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Edit"
-        app:icon="@android:drawable/ic_menu_edit"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/deleteButton"
-        app:layout_constraintTop_toTopOf="@+id/deleteButton"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <androidx.cardview.widget.CardView
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp"
-        app:cardBackgroundColor="@color/colorPrimary"
-        app:cardCornerRadius="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/deleteButton"
+        android:fillViewport="true"
+        android:scrollIndicators="left"
+        android:scrollbarSize="6dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/cancelEditFragmentButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CardMapView">
+        app:layout_constraintTop_toBottomOf="@id/CardMapEditView">
 
-        <ScrollView
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -113,13 +61,12 @@
                 <!-- Row 1: Name -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/namePhotoTextView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="24dp"
@@ -129,21 +76,20 @@
                         android:textSize="16sp" />
 
                     <TextView
-                        android:id="@+id/nameDetailFragmentTextView"
+                        android:id="@+id/namePhotoEditFragmentTextView"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_marginEnd="24dp"
                         android:layout_weight="1"
-                        android:text="Name"
+                        android:inputType="text"
                         android:textColor="@color/white"
-                        android:textSize="16sp" />
-
+                        android:textColorHint="#B0BEC5" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -157,13 +103,14 @@
                         android:textSize="16sp" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_marginEnd="24dp"
+                        android:background="@color/colorPrimaryDark"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
                         android:layout_weight="1">
 
                         <ImageView
-                            android:id="@+id/genreIconImageView"
+                            android:id="@+id/genreIconEditFragmentImageView"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -172,15 +119,12 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/genreDetailFragmentTextView"
+                        <Spinner
+                            android:id="@+id/genreEditFragmentSpinner"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:text="Genre"
-                            android:textColor="@color/white"
-                            android:textSize="16dp"
+                            android:layout_height="0dp"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/genreIconImageView"
+                            app:layout_constraintEnd_toStartOf="@+id/genreIconEditFragmentImageView"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -192,7 +136,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -205,22 +149,21 @@
                         android:textColor="@color/white"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/shutterTextView"
+                    <Spinner
+                        android:id="@+id/shutterSpeedEditFragmentSpinner"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="24dp"
                         android:layout_weight="1"
-                        android:text="Shutter Speed"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
+                        android:background="@color/colorPrimaryDark"
+                        android:minHeight="48dp" />
                 </LinearLayout>
 
                 <!-- Row 3: F-stop -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -233,23 +176,21 @@
                         android:textColor="@color/white"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/fStopDetailFragmentTextView"
+                    <Spinner
+                        android:id="@+id/fStopEditFragmentSpinner"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="24dp"
                         android:layout_weight="1"
-                        android:text="F-stop"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
+                        android:background="@color/colorPrimaryDark"
+                        android:minHeight="48dp" />
                 </LinearLayout>
 
                 <!-- Row 4: ISO -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -262,23 +203,21 @@
                         android:textColor="@color/white"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/isoDetailFragmentTextView"
+                    <Spinner
+                        android:id="@+id/isoEditFragmentSpinner"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="24dp"
                         android:layout_weight="1"
-                        android:text="ISO"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
+                        android:background="@color/colorPrimaryDark"
+                        android:minHeight="48dp" />
                 </LinearLayout>
 
                 <!-- Row 5: Focal Length -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -291,23 +230,23 @@
                         android:textColor="@color/white"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/focalLenDetailFragmentTextView"
+                    <EditText
+                        android:id="@+id/focalLengthEditFragmentEditText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="24dp"
                         android:layout_weight="1"
+                        android:inputType="number"
                         android:text="35"
                         android:textColor="@color/white"
-                        android:textSize="16sp" />
-
+                        android:textColorHint="#E91A1A" />
                 </LinearLayout>
 
                 <!-- Row 6: TAG -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -320,21 +259,20 @@
                         android:textColor="@color/white"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tagDetailFragmentTextView"
+                    <EditText
+                        android:id="@+id/tagEditFragmentEditText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="24dp"
                         android:layout_weight="1"
                         android:hint="TAG"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
+                        android:inputType="text"
+                        android:textColor="@color/white" />
                 </LinearLayout>
 
                 <!-- Row 7: Note -->
                 <EditText
-                    android:id="@+id/noteEditText"
+                    android:id="@+id/noteEditFragmentEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
@@ -347,6 +285,7 @@
                     android:textColor="@color/white"
                     android:textColorHint="#B0BEC5"
                     android:textSize="16sp" />
+
 
                 <LinearLayout
                     android:id="@+id/imageLinearLayout"
@@ -368,7 +307,114 @@
                 </LinearLayout>
 
             </LinearLayout>
-        </ScrollView>
+        </androidx.cardview.widget.CardView>
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/CardMapEditView"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        app:cardCornerRadius="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/EditMarkerToolBar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapViewEditFragment"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:contentDescription="Visualize marker in map"
+                app:circularflow_radiusInDP="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/mapTypeEditFAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foregroundTint="@color/colorOnPrimary"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:src="@drawable/layer_basemap_svgrepo_com"
+                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTintMode="add"
+                app:layout_constraintBottom_toBottomOf="@+id/mapViewEditFragment"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.98"
+                app:layout_constraintStart_toStartOf="@+id/mapViewEditFragment"
+                app:layout_constraintTop_toTopOf="@+id/mapViewEditFragment"
+                app:layout_constraintVertical_bias="0.98"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                app:tint="@color/colorOnPrimary" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/threeDimensionEditFAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foregroundTint="@color/colorOnPrimary"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:src="@drawable/cube_alt_2_svgrepo_com"
+                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTintMode="add"
+                app:layout_constraintBottom_toTopOf="@+id/mapTypeEditFAB"
+                app:layout_constraintEnd_toEndOf="@+id/mapTypeEditFAB"
+                app:layout_constraintStart_toStartOf="@+id/mapTypeEditFAB"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                app:tint="@color/colorOnPrimary" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/rotationEditSlider"
+                android:layout_width="250dp"
+
+                android:layout_height="4dp"
+                android:value="0"
+                android:valueFrom="-180"
+                android:valueTo="180"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/mapViewEditFragment"
+                app:layout_constraintVertical_bias="1.0"
+                app:trackColorInactive="#5F7A81" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/cancelEditFragmentButton"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="4dp"
+        android:text="Cancel"
+        app:icon="@android:drawable/ic_menu_close_clear_cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/saveEditButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/saveEditButton"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:text="Save"
+        app:layout_constraintBottom_toBottomOf="@+id/cancelEditFragmentButton"
+        app:icon="@android:drawable/ic_menu_save"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/cancelEditFragmentButton"
+        app:layout_constraintTop_toTopOf="@+id/cancelEditFragmentButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
