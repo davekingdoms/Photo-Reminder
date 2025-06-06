@@ -21,6 +21,12 @@ class MarkerViewModel(
         }
     }
 
+    fun updateMarker(marker: MarkerEntity) {
+        viewModelScope.launch {
+            repository.updateMarker(marker)
+        }
+    }
+
     /** Marca localmente una cancellazione */
     fun deleteMarker(id: String) {
         viewModelScope.launch {

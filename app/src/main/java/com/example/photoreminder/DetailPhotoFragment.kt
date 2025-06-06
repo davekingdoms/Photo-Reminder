@@ -122,8 +122,9 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
 
 
         binding.editButton.setOnClickListener {
-            // TODO: implement edit flow in a separate fragment
-            Toast.makeText(requireContext(), "Edit feature coming soon", Toast.LENGTH_SHORT).show()
+           val action = DetailPhotoFragmentDirections.actionDetailPhotoFragmentToEditMarkerFragment(
+               currentMarker!!.id)
+            findNavController().navigate(action)
         }
     }
 

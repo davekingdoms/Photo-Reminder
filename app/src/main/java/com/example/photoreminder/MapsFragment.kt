@@ -15,6 +15,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.photoreminder.data.local.MarkerDatabase
 import com.example.photoreminder.data.local.MarkerEntity
@@ -46,7 +47,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
-
+    private val args: MapsFragmentArgs by navArgs()
     private lateinit var googleMap: GoogleMap
     private val fineLocation = android.Manifest.permission.ACCESS_FINE_LOCATION
     private enum class LocationMode { LAST_KNOWN, CURRENT_BALANCED, CURRENT_HIGH }
@@ -253,6 +254,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             findNavController().navigate(action)
         }
 
+        args.centerLat?.let { lat ->
+            args.centerLng?.let { lng -> lat to lng }
+        }?.let { (lat, lng) ->
+            moveCamera(lat.toDouble(),lng.toDouble(), 17f)
+        }
+
+
         // Disegno iniziale dei marker (se già presenti)
         drawMarkersOnMap()
     }
@@ -278,7 +286,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     .position(LatLng(m.lat, m.lng))
                     .title(m.title)
                     .icon(getIconForGenre(m.genre))
-                    .anchor(0.5f, 1f)
+                    .anchor(0.5f, 0.5f)
             )
             // Assegno l'id dell'entità Room come tag
             gmMarker?.tag = m.id
