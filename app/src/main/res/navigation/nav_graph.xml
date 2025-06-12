@@ -43,10 +43,13 @@
         tools:layout="@layout/fragment_maps" >
         <argument
             android:name="centerLat"
-            app:argType="float" />
+            app:argType="string"
+            app:nullable="true" />
+
         <argument
             android:name="centerLng"
-            app:argType="float" />
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_mapsFragment_to_addPhotoMarkerFragment"
             app:destination="@id/addPhotoMarkerFragment" />
@@ -129,6 +132,9 @@
             />
         <action
             android:id="@+id/action_editMarkerFragment_to_mapsFragment"
-            app:destination="@id/mapsFragment" />
+            app:destination="@id/mapsFragment"
+            app:popUpTo="@id/mapsFragment"
+            app:popUpToInclusive="true"
+            app:launchSingleTop="true"/>
     </fragment>
 </navigation>

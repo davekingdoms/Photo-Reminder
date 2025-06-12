@@ -122,9 +122,10 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
 
 
         binding.editButton.setOnClickListener {
-           val action = DetailPhotoFragmentDirections.actionDetailPhotoFragmentToEditMarkerFragment(
-               currentMarker!!.id)
-            findNavController().navigate(action)
+           currentMarker?.let {
+               val action = DetailPhotoFragmentDirections.actionDetailPhotoFragmentToEditMarkerFragment(it.id)
+               findNavController().navigate(action)
+           }
         }
     }
 
@@ -197,9 +198,12 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         googleMap.uiSettings.isMyLocationButtonEnabled = false
         googleMap.uiSettings.isCompassEnabled = false
         googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
-
+        binding.editButton.isEnabled = false
+        binding.deleteButton.isEnabled = false
         // Se abbiamo già caricato il marker, disegniamolo ora
         currentMarker?.let { drawMarkerOnMap(it) }
+        binding.editButton.isEnabled = true
+        binding.deleteButton.isEnabled = true
     }
 
     /** Posiziona un pin sulla mappa e centra la camera su [marker] */

@@ -253,12 +253,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 )
             findNavController().navigate(action)
         }
+/*
+        args.centerLat?.toDoubleOrNull()?.let { lat ->
+            args.centerLng?.toDoubleOrNull()?.let { lng ->
+                moveCamera(lat, lng, 17f)
+            }
+    }*/
 
-        args.centerLat?.let { lat ->
-            args.centerLng?.let { lng -> lat to lng }
-        }?.let { (lat, lng) ->
-            moveCamera(lat.toDouble(),lng.toDouble(), 17f)
-        }
 
 
         // Disegno iniziale dei marker (se già presenti)

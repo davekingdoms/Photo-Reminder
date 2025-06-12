@@ -31,7 +31,9 @@
         android:id="@+id/nestedScrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="4dp"
         android:fillViewport="true"
         android:scrollIndicators="left"
@@ -105,11 +107,11 @@
                         android:textSize="16sp" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_marginEnd="24dp"
-                        android:background="@color/colorPrimaryDark"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                        android:layout_marginEnd="24dp"
+                        android:layout_weight="1"
+                        android:background="@color/colorPrimaryDark">
 
                         <ImageView
                             android:id="@+id/genreIconImageView"
@@ -409,6 +411,7 @@
         android:id="@+id/cancelButton"
         android:layout_width="0dp"
         android:layout_height="40dp"
+        android:layout_marginStart="8dp"
         android:layout_marginBottom="4dp"
         android:text="Cancel"
         app:icon="@android:drawable/ic_menu_close_clear_cancel"
@@ -421,9 +424,10 @@
         android:id="@+id/saveButton"
         android:layout_width="0dp"
         android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
         android:text="Save"
-        app:layout_constraintBottom_toBottomOf="@+id/cancelButton"
         app:icon="@android:drawable/ic_menu_save"
+        app:layout_constraintBottom_toBottomOf="@+id/cancelButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/cancelButton"

@@ -102,7 +102,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="16dp"
                 android:orientation="vertical"
@@ -142,7 +142,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -191,7 +191,7 @@
                 <!-- Row 2: Shutter Speed -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -219,7 +219,7 @@
                 <!-- Row 3: F-stop -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -248,7 +248,7 @@
                 <!-- Row 4: ISO -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -277,7 +277,7 @@
                 <!-- Row 5: Focal Length -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -306,7 +306,7 @@
                 <!-- Row 6: TAG -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
