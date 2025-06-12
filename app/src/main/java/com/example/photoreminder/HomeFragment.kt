@@ -102,7 +102,7 @@ class HomeFragment : Fragment() {
         /* serializza i job con nome univoco */
         wm.enqueueUniqueWork(
             MarkerSyncWorker.UNIQUE_WORK_NAME,
-            ExistingWorkPolicy.KEEP,   // se c’è già → ignora
+            ExistingWorkPolicy.REPLACE,
             req
         )
 
