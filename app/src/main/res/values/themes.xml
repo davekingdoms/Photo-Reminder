@@ -9,15 +9,16 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
-        <item name="android:windowBackground">@color/colorPrimaryDark</item>
-        <item name="cardBackgroundColor">@color/colorPrimary</item>
+        <!--   <item name="android:windowBackground">@color/colorPrimaryDark</item>-->
+           <item name="cardBackgroundColor">@color/colorPrimary</item>
+           <item name="android:windowBackground">@drawable/background</item>
 
-    </style>
+       </style>
 
-    <style name="Theme.PhotoReminder" parent="Base.Theme.PhotoReminder" />
-    <style name="PlacesAutocompleteTheme">
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorHint">@color/white</item>
-        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.FilledBox</item>
-    </style>
-</resources>
+       <style name="Theme.PhotoReminder" parent="Base.Theme.PhotoReminder" />
+       <style name="PlacesAutocompleteTheme">
+           <item name="android:textColorPrimary">@color/white</item>
+           <item name="android:textColorHint">@color/white</item>
+           <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.FilledBox</item>
+       </style>
+   </resources>

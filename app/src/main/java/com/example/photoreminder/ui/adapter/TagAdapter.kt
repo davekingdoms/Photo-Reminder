@@ -66,14 +66,38 @@ class TagAdapter(
      * torna a "All" (e notifica onTagSelected("All")).
      */
     fun updateTags(newTags: List<String>) {
-        // Se il tag selezionato non c’è più, resettiamo a "All"
+        val oldTags = tags
+        val oldSelected = selectedTag
+        var shouldNotifyAllSelected = false
+
+        // Determine if selected tag is still valid in new list
         if (!newTags.any { it.equals(selectedTag, ignoreCase = true) }) {
             selectedTag = "All"
+            shouldNotifyAllSelected = true
         }
+
         tags = newTags
-        notifyDataSetChanged()
-        // Se appena abbiamo impostato a "All", notifico subito la callback:
-        if (selectedTag.equals("All", ignoreCase = true)) {
+
+        // Calculate diff and dispatch updates
+        val diffResult = androidx.recyclerview.widget.DiffUtil.calculateDiff(object : androidx.recyclerview.widget.DiffUtil.Callback() {
+            override fun getOldListSize(): Int = oldTags.size
+            override fun getNewListSize(): Int = tags.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldTags[oldItemPosition] == tags[newItemPosition]
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                // For tags, content is the same if the tag string is the same
+                // We also need to consider the selected state, which is handled in onBindViewHolder
+                return oldTags[oldItemPosition] == tags[newItemPosition] &&
+                        (oldTags[oldItemPosition].equals(oldSelected, ignoreCase = true) == tags[newItemPosition].equals(selectedTag, ignoreCase = true))
+            }
+        })
+        diffResult.dispatchUpdatesTo(this)
+
+        // Notify if "All" was just set
+        if (shouldNotifyAllSelected) {
             onTagSelected("All")
         }
     }

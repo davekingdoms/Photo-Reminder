@@ -5,7 +5,6 @@
     android:id="@+id/frameLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     tools:context=".HomeFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -26,7 +25,7 @@
         android:layout_height="200dp"
         android:backgroundTint="@color/colorPrimary"
         app:cardCornerRadius="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/cardView"
+        app:layout_constraintBottom_toTopOf="@+id/cardViewList"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +63,7 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/cardViewList"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginTop="32dp"
@@ -120,7 +119,7 @@
         app:iconPadding="2dp"
         app:iconTint="#D90000"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/cardView"
+        app:layout_constraintEnd_toStartOf="@+id/cardViewList"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -137,6 +136,6 @@
         app:iconPadding="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cardView" />
+        app:layout_constraintStart_toEndOf="@+id/cardViewList" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
