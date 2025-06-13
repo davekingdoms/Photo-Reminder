@@ -32,9 +32,9 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:background="@color/colorPrimary"
-        android:backgroundTint="@color/colorPrimary"
-        app:cardBackgroundColor="@color/colorPrimary"
+        android:background="@color/colorBackground"
+        android:backgroundTint="@color/colorBackground"
+        app:cardBackgroundColor="@color/colorBackground"
         app:cardCornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,11 +51,22 @@
                 android:contentDescription="Visualize marker in map"
                 app:circularflow_radiusInDP="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintEnd_toStartOf="@+id/imageView4"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/markerDetailMapView"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@tools:sample/avatars" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -339,6 +350,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
                     android:layout_marginEnd="24dp"
+                    android:editable="false"
                     android:hint="Insert note..."
                     android:inputType="textMultiLine"
                     android:maxLines="6"
@@ -348,24 +360,12 @@
                     android:textColorHint="#B0BEC5"
                     android:textSize="16sp" />
 
-                <LinearLayout
-                    android:id="@+id/imageLinearLayout"
+                <androidx.recyclerview.widget.RecyclerView
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:gravity="center_vertical"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
                     android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="150dp"
-                        android:layout_marginStart="24dp"
-                        android:layout_marginEnd="24dp"
-
-                        android:adjustViewBounds="true"
-                        android:contentDescription="Preview Image"
-                        android:scaleType="centerInside" />
-                </LinearLayout>
+                    android:scrollbars="horizontal" />
 
             </LinearLayout>
         </ScrollView>
