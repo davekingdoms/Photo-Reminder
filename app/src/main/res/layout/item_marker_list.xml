@@ -4,10 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardViewConstrain"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:backgroundTint="@color/material_dynamic_neutral_variant30"
-    android:foregroundTint="@color/material_dynamic_neutral_variant30"
-    android:background="@color/material_dynamic_neutral_variant30">
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/itemCardView"
