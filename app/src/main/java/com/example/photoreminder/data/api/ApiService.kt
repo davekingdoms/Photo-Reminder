@@ -6,6 +6,7 @@ import com.example.photoreminder.data.model.RegisterRequest
 import com.example.photoreminder.data.model.GetMarkersResponse
 import com.example.photoreminder.data.model.MarkerDto
 import com.example.photoreminder.data.model.MarkerResponse
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -35,4 +36,11 @@ interface ApiService {
 
     @DELETE("markers/{id}")
     suspend fun deleteMarker(@Path("id") id: String): Response<MarkerResponse>
+
+    @Multipart
+    @POST("markers/{id}/photos")
+    suspend fun uploadPhotos(
+        @Path("id") markerId: String,
+        @Part files: List<MultipartBody.Part>
+    ): Response<PhotoIdsResponse>
 }

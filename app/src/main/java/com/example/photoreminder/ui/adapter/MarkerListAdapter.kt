@@ -2,6 +2,8 @@ package com.example.photoreminder.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photoreminder.data.local.MarkerEntity
 import com.example.photoreminder.databinding.ItemMarkerListBinding
@@ -9,37 +11,41 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class MarkerListAdapter(
-    private var items: List<MarkerEntity>,
     private val onClick: (MarkerEntity) -> Unit
-) : RecyclerView.Adapter<MarkerListAdapter.MarkerVH>() {
+) : ListAdapter<MarkerEntity, MarkerListAdapter.MarkerVH>(DIFF) {
 
     private val df = SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault())
 
     inner class MarkerVH(val binding: ItemMarkerListBinding)
         : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: MarkerEntity, pos: Int) = with(binding) {
-            numberItem.text = (pos + 1).toString()
-            itemNameTextView.text = item.title
-            dateTextView.text = df.format(Date(item.updatedAt))
-            latTextView.text = "lat: %.5f".format(item.lat)
-            longTextView.text = "lng: %.5f".format(item.lng)
+            numberItem.text      = (pos + 1).toString()
+            itemNameTextView.text= item.title
+            dateTextView.text    = df.format(Date(item.updatedAt))
+            latTextView.text     = "lat: %.5f".format(item.lat)
+            longTextView.text    = "lng: %.5f".format(item.lng)
             itemTagValueTextView.text = item.tag ?: "—"
-
             root.setOnClickListener { onClick(item) }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MarkerVH =
-        MarkerVH(ItemMarkerListBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false))
+        MarkerVH(
+            ItemMarkerListBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
+        )
 
     override fun onBindViewHolder(holder: MarkerVH, position: Int) =
-        holder.bind(items[position], position)
+        holder.bind(getItem(position), position)
 
-    override fun getItemCount(): Int = items.size
+    companion object {
+        private val DIFF = object : DiffUtil.ItemCallback<MarkerEntity>() {
+            override fun areItemsTheSame(oldItem: MarkerEntity, newItem: MarkerEntity) =
+                oldItem.id == newItem.id
 
-    fun submit(newList: List<MarkerEntity>) {
-        items = newList
-        notifyDataSetChanged()
+            override fun areContentsTheSame(oldItem: MarkerEntity, newItem: MarkerEntity) =
+                oldItem == newItem          // data-class equality sfrutta tutti i campi
+        }
     }
 }

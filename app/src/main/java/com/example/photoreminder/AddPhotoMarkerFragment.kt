@@ -64,6 +64,10 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
         latLng = LatLng(args.lat.toDouble(), args.lng.toDouble())
         binding.mapViewMarker.onCreate(savedInstanceState)
         binding.mapViewMarker.getMapAsync(this)
+        binding.addPhotoButton.setOnClickListener {
+            val action = AddPhotoMarkerFragmentDirections.actionAddPhotoMarkerFragmentToCameraFragment()
+            findNavController().navigate(action)
+        }
 
         setupSpinners()
 

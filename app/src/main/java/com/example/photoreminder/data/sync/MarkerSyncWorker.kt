@@ -2,8 +2,10 @@ package com.example.photoreminder.data.sync
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import android.util.Log
 import androidx.work.*
+import com.example.photoreminder.data.api.ApiService
 import com.example.photoreminder.data.api.RetrofitInstance
 import com.example.photoreminder.data.datastore.DataStoreManager
 import com.example.photoreminder.data.local.MarkerDatabase
@@ -13,7 +15,10 @@ import com.example.photoreminder.data.model.toEntity
 import com.example.photoreminder.data.repository.MarkerRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
 import retrofit2.HttpException
+import java.io.File
+import java.io.IOException
 
 /** Sincronizza Room ↔ backend; unica coda “marker_sync_global” */
 class MarkerSyncWorker(
@@ -65,40 +70,77 @@ class MarkerSyncWorker(
 
     private suspend fun pushLocalChanges(
         repo: MarkerRepository,
-        api: com.example.photoreminder.data.api.ApiService
+        api: ApiService
     ) {
-        for (entity in repo.getPendingForSync()) {
+        val ctx = applicationContext
+
+        for (entity0 in repo.getPendingForSync()) {
+            var entity = entity0          // potrà mutare se carichiamo foto
             kotlin.runCatching {
+
+                /* ---- 1) carica eventuali foto non ancora sincronizzate ---- */
+                val notSynced = entity.photos.filter { !it.synced }
+                if (notSynced.isNotEmpty()) {
+                    val parts = notSynced.map { pr ->
+                        // leggiamo il file (Uri → bytes)
+                        val bytes = ctx.contentResolver
+                            .openInputStream(Uri.parse(pr.localUri!!))
+                            ?.readBytes()
+                            ?: throw IOException("Impossibile leggere ${pr.localUri}")
+
+                        val media = okhttp3.MediaType.parse("image/jpeg")
+                        val body  = okhttp3.RequestBody.create(media, bytes)
+                        MultipartBody.Part.createFormData(
+                            "files",
+                            File(pr.thumbPath).name,
+                            body
+                        )
+                    }
+
+                    val ids = api.uploadPhotos(entity.id, parts)
+                        .bodyOrThrow()
+                        .photoIds
+
+                    // aggiorniamo la lista photos
+                    val updatedPhotos = entity.photos.mapIndexed { i, pr ->
+                        if (pr.synced) pr else pr.copy(
+                            remoteId = ids[i],
+                            synced   = true,
+                            localUri = null        // non serve più tenere Uri
+                        )
+                    }
+                    entity = entity.copy(photos = updatedPhotos)
+                }
+
+                /* ---- 2) push marker sul server (POST o PUT) ---- */
                 when (entity.syncStatus) {
                     SyncStatus.LOCAL_ONLY -> {
-                        val dto = entity.toDto().copy(id = null)      // non inviare UUID locale
-                        val serverId = api.createMarker(dto).bodyOrThrow().marker.id
-
-                        if (serverId != null && serverId != entity.id) {
-                            repo.replaceId(entity.id, serverId)
+                        val newId = api.createMarker(entity.toDto())
+                            .bodyOrThrow()
+                            .marker.id
+                        if (newId != null && newId != entity.id) {
+                            repo.replaceId(entity.id, newId)
                         } else {
                             repo.markSynced(entity.id)
                         }
-                        Log.d(TAG, "POST ok → id $serverId")
                     }
 
                     SyncStatus.DIRTY -> {
                         api.updateMarker(entity.id, entity.toDto()).bodyOrThrow()
                         repo.markSynced(entity.id)
-                        Log.d(TAG, "PUT ok → id ${entity.id}")
                     }
 
                     SyncStatus.PENDING_DELETE -> {
                         api.deleteMarker(entity.id).bodyOrThrow()
-                        repo.remove(entity.id)            // delete fisico
-                        Log.d(TAG, "DELETE ok → id ${entity.id}")
+                        repo.remove(entity.id)
                     }
 
                     else -> Unit
                 }
-            }.onFailure {
-                Log.e(TAG, "Push failed on id=${entity.id}", it)
-                // lasciamo il syncStatus invariato → riproverà
+
+            }.onFailure { e ->
+                Log.e(TAG, "Push failed on id=${entity.id}", e)
+                // lascio syncStatus invariato: ritenterà
             }
         }
     }
