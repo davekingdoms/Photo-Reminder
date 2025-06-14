@@ -65,7 +65,7 @@ class ListPhotoFragment : Fragment() {
         }
 
         /* Marker Recycler (verticale) */
-        markerAdapter = MarkerListAdapter(emptyList()) { marker ->
+        markerAdapter = MarkerListAdapter { marker ->
             val action = ListPhotoFragmentDirections
                 .actionListPhotoFragmentToDetailPhotoFragment(marker.id)
             findNavController().navigate(action)
@@ -106,7 +106,7 @@ class ListPhotoFragment : Fragment() {
             }
         }.sortedByDescending { it.updatedAt }
 
-        markerAdapter.submit(filtered)
+        markerAdapter.submitList(filtered)
     }
 
     override fun onDestroyView() {

@@ -3,6 +3,7 @@ package com.example.photoreminder.data.local
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.photoreminder.data.model.PhotoRef
 
 @Entity(
     tableName = "markers",
@@ -25,7 +26,7 @@ data class MarkerEntity(
     val focalLength: Int,
     val tag: String?,
     val notes: String?,
-    val photoUrl: String?,
+    val photos: List<PhotoRef> = emptyList(),
     val createdAt: Long,
     val updatedAt: Long,
     val syncStatus: SyncStatus = SyncStatus.LOCAL_ONLY

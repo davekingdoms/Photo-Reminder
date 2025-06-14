@@ -17,7 +17,7 @@ data class MarkerDto(
     val focalLength: Int?,
     val tag: String?,
     val notes: String?,
-    val photoUrl: String?,
+    val photos: List<PhotoRef> = emptyList(),
     val angle: Float,
     val createdAt: Long,
     val updatedAt: Long,

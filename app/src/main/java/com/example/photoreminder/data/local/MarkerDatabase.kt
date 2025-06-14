@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [MarkerEntity::class], version = 2, exportSchema = false
+@Database(entities = [MarkerEntity::class], version = 3, exportSchema = false
 )
 @TypeConverters(MarkerConverters::class)
 abstract class MarkerDatabase : RoomDatabase() {
@@ -24,9 +24,7 @@ abstract class MarkerDatabase : RoomDatabase() {
                     MarkerDatabase::class.java,
                     "marker_database"
                 )
-                    .fallbackToDestructiveMigration()
                     .build()
-                    .also { INSTANCE = it }
             }
     }
 }
