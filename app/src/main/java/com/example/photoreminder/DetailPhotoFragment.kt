@@ -37,27 +37,43 @@ import kotlin.math.roundToInt
 
 class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
 
+    /* ---------------- binding & args ---------------- */
     private var _binding: FragmentDetailPhotoBinding? = null
     private val binding get() = _binding!!
     private val args: DetailPhotoFragmentArgs by navArgs()
+
+    /* ---------------- map ---------------- */
     private lateinit var googleMap: GoogleMap
-    private var mapIsReady: Boolean = false
+    private var mapIsReady = false
     private lateinit var photoMarker: Marker
 
-    // Il marker caricato dal database
+    /* ---------------- data ---------------- */
     private var currentMarker: MarkerEntity? = null
-    private val thumbAdapter by lazy { ThumbnailAdapter() }
 
-    // ViewModel per operazioni locali (delete, ecc.)
+    /* ---------------- adapter ---------------- */
+    private val thumbAdapter by lazy {
+        ThumbnailAdapter { pr, _ ->
+            val action =
+                DetailPhotoFragmentDirections
+                    .actionDetailPhotoFragmentToImageFragment(
+                        remoteId  = pr.remoteId ?: "",
+                        thumbPath = pr.thumbPath
+                    )
+            findNavController().navigate(action)
+        }
+    }
+
+    /* ---------------- view-model ---------------- */
     private val viewModel: MarkerViewModel by lazy {
         val dao = MarkerDatabase.getDatabase(requireContext()).markerDao()
         MarkerViewModelFactory(MarkerRepository(dao))
             .create(MarkerViewModel::class.java)
     }
 
+    /* ---------------- lifecycle ---------------- */
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailPhotoBinding.inflate(inflater, container, false)
         return binding.root
@@ -67,17 +83,16 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Toolbar back
+        /* Toolbar back */
         binding.detailPhotoMarkerToolBar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 
-        // Inizializza MapView
+        /* MapView */
         binding.markerDetailMapView.onCreate(savedInstanceState)
         binding.markerDetailMapView.getMapAsync(this)
 
-        // Carica i dettagli del marker da Room
-        loadMarkerDetails(args.id)
+        /* Thumbnails Recycler */
         binding.thumbRecyclerView.apply {
             adapter = thumbAdapter
             layoutManager = LinearLayoutManager(
@@ -85,60 +100,16 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
             )
         }
 
-        // Delete button
-        binding.deleteButton.setOnClickListener {
-            currentMarker?.let { marker ->
-                // Mostra un dialogo di conferma
-                androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                    .setTitle("Conferma Eliminazione")
-                    .setMessage("Sei sicuro di voler eliminare questo marker? L'eliminazione verrà sincronizzata con il server.")
-                    .setPositiveButton("Elimina") { dialog, which ->
-                        // Imposta lo stato del marker a PENDING_DELETE localmente
-                        viewModel.deleteMarker(marker.id)
+        /* Carica dati marker */
+        loadMarkerDetails(args.id)
 
-                        // Avvia sync one-time per propagare la DELETE
-                        val req = OneTimeWorkRequestBuilder<MarkerSyncWorker>().build()
-                        val wm = WorkManager.getInstance(requireContext())
-                        wm.enqueue(req)
-
-                        // Osserva lo stato del worker per feedback e navigazione
-                        wm.getWorkInfoByIdLiveData(req.id)
-                            .observe(viewLifecycleOwner) { info ->
-                                info?.let {
-                                    if (it.state.isFinished) {
-                                        val msg = it.outputData.getString("message")
-                                            ?: it.outputData.getString("errorMessage")
-                                        if (!msg.isNullOrBlank()) {
-                                            Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
-                                        } else {
-                                            // Messaggio di default se non c'è un messaggio specifico
-                                            if (it.state == androidx.work.WorkInfo.State.SUCCEEDED) {
-                                                Toast.makeText(requireContext(), "Marker eliminato con successo!", Toast.LENGTH_SHORT).show()
-                                            } else if (it.state == androidx.work.WorkInfo.State.FAILED) {
-                                                Toast.makeText(requireContext(), "Errore durante l'eliminazione del marker.", Toast.LENGTH_SHORT).show()
-                                            }
-                                        }
-                                        // Naviga solo DOPO che il worker ha completato/fallito e fornito feedback
-                                        findNavController().navigateUp()
-                                    }
-                                }
-                            }
-                    }
-                    .setNegativeButton("Annulla", null) // Non fa nulla, chiude il dialogo
-                    .show()
-            }
-        }
-
-
-        binding.editButton.setOnClickListener {
-           currentMarker?.let {
-               val action = DetailPhotoFragmentDirections.actionDetailPhotoFragmentToEditMarkerFragment(it.id)
-               findNavController().navigate(action)
-           }
-        }
+        /* Pulsanti */
+        setUpDeleteButton()
+        setUpEditButton()
     }
 
-    /** Carica da Room il MarkerEntity con l’ID fornito */
+    /* ---------------- caricamento dati ---------------- */
+
     private fun loadMarkerDetails(id: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             val dao = MarkerDatabase.getDatabase(requireContext()).markerDao()
@@ -147,10 +118,8 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
                 currentMarker = marker
                 launch(Dispatchers.Main) {
                     populateFields(marker)
-                    thumbAdapter.submit(marker.photos.map { it.thumbPath })
-                    if (mapIsReady) {
-                        drawMarkerOnMap(marker)
-                    }
+                    thumbAdapter.submit(marker.photos)          // lista PhotoRef
+                    if (mapIsReady) drawMarkerOnMap(marker)
                 }
             } else {
                 launch(Dispatchers.Main) {
@@ -161,14 +130,14 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    /** Popola tutti i campi del layout con i dati di [marker] */
+    /* ---------------- UI ---------------- */
 
     @SuppressLint("SetTextI18n")
-    private fun populateFields(marker: MarkerEntity) {
-        binding.nameDetailFragmentTextView.text = marker.title
+    private fun populateFields(marker: MarkerEntity) = with(binding) {
+        nameDetailFragmentTextView.text = marker.title
 
-        // Genre e icona
-        binding.genreDetailFragmentTextView.text = marker.genre
+        /* Genre + icona */
+        genreDetailFragmentTextView.text = marker.genre
         val iconRes = when (marker.genre.lowercase()) {
             "street"     -> R.drawable.street_icon
             "drone"      -> R.drawable.drone_icon
@@ -180,45 +149,31 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
             "star trail" -> R.drawable.star_trail_icon
             else         -> R.drawable.street_icon
         }
-        binding.genreIconImageView.setImageDrawable(
+        genreIconImageView.setImageDrawable(
             ResourcesCompat.getDrawable(resources, iconRes, null)
         )
 
-        // Shutter Speed, F-stop, ISO
-        binding.shutterTextView.text = marker.shutterSpeed
-        binding.fStopDetailFragmentTextView.text = marker.aperture
-        binding.isoDetailFragmentTextView.text = marker.iso
-
-        // Focal Length
-        binding.focalLenDetailFragmentTextView.text = marker.focalLength.toString()
-
-        // Tag
-        binding.tagDetailFragmentTextView.text = marker.tag
-
-        // Notes
-        binding.noteEditText.setText(marker.notes)
+        shutterTextView.text           = marker.shutterSpeed
+        fStopDetailFragmentTextView.text = marker.aperture
+        isoDetailFragmentTextView.text   = marker.iso
+        focalLenDetailFragmentTextView.text = marker.focalLength.toString()
+        tagDetailFragmentTextView.text     = marker.tag
+        noteEditText.setText(marker.notes)
     }
 
-    /** Chiamato quando GoogleMap è pronto */
+    /* ---------------- Map ---------------- */
+
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         mapIsReady = true
-
-        // Opzioni base della mappa
         googleMap.uiSettings.isMyLocationButtonEnabled = false
         googleMap.uiSettings.isCompassEnabled = false
         googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
-        binding.editButton.isEnabled = false
-        binding.deleteButton.isEnabled = false
-        // Se abbiamo già caricato il marker, disegniamolo ora
         currentMarker?.let { drawMarkerOnMap(it) }
-        binding.editButton.isEnabled = true
-        binding.deleteButton.isEnabled = true
     }
 
-    /** Posiziona un pin sulla mappa e centra la camera su [marker] */
     private fun drawMarkerOnMap(marker: MarkerEntity) {
-        val position = LatLng(marker.lat, marker.lng)
+        val pos = LatLng(marker.lat, marker.lng)
         val bmp = Bitmap.createScaledBitmap(
             BitmapFactory.decodeResource(resources, R.drawable.icon_fov),
             (48 * resources.displayMetrics.density).roundToInt(),
@@ -228,16 +183,81 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         googleMap.clear()
         photoMarker = googleMap.addMarker(
             MarkerOptions()
-                .position(position)
+                .position(pos)
                 .icon(BitmapDescriptorFactory.fromBitmap(bmp))
                 .anchor(0.5f, 0.5f)
                 .rotation(marker.angle)
                 .flat(true)
         )!!
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 18f))
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 18f))
     }
 
-    // Lifecycle della MapView
+    /* ---------------- Delete ---------------- */
+
+    private fun setUpDeleteButton() {
+        binding.deleteButton.setOnClickListener {
+            currentMarker?.let { marker ->
+                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Conferma Eliminazione")
+                    .setMessage(
+                        "Sei sicuro di voler eliminare questo marker? " +
+                                "L'eliminazione verrà sincronizzata con il server."
+                    )
+                    .setPositiveButton("Elimina") { _, _ ->
+                        viewModel.deleteMarker(marker.id)
+
+                        val req = OneTimeWorkRequestBuilder<MarkerSyncWorker>().build()
+                        val wm = WorkManager.getInstance(requireContext())
+                        wm.enqueue(req)
+
+                        wm.getWorkInfoByIdLiveData(req.id)
+                            .observe(viewLifecycleOwner) { info ->
+                                info?.let {
+                                    if (it.state.isFinished) {
+                                        val msg = it.outputData.getString("message")
+                                            ?: it.outputData.getString("errorMessage")
+                                        if (!msg.isNullOrBlank())
+                                            Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG)
+                                                .show()
+                                        else if (it.state == androidx.work.WorkInfo.State.SUCCEEDED)
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Marker eliminato con successo!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        else if (it.state == androidx.work.WorkInfo.State.FAILED)
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Errore durante l'eliminazione del marker.",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                        findNavController().navigateUp()
+                                    }
+                                }
+                            }
+                    }
+                    .setNegativeButton("Annulla", null)
+                    .show()
+            }
+        }
+    }
+
+    /* ---------------- Edit ---------------- */
+
+    private fun setUpEditButton() {
+        binding.editButton.setOnClickListener {
+            currentMarker?.let {
+                val action =
+                    DetailPhotoFragmentDirections
+                        .actionDetailPhotoFragmentToEditMarkerFragment(it.id)
+                findNavController().navigate(action)
+            }
+        }
+    }
+
+    /* ---------------- MapView lifecycle ---------------- */
+
     override fun onStart() { super.onStart(); binding.markerDetailMapView.onStart() }
     override fun onResume() { super.onResume(); binding.markerDetailMapView.onResume() }
     override fun onPause() { binding.markerDetailMapView.onPause(); super.onPause() }

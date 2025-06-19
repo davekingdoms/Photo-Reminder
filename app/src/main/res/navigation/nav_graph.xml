@@ -120,7 +120,15 @@
         android:id="@+id/imageFragment"
         android:name="com.example.photoreminder.ImageFragment"
         android:label="fragment_image"
-        tools:layout="@layout/fragment_image" />
+        tools:layout="@layout/fragment_image" >
+
+         <argument
+            android:name="remoteId"
+            app:argType="string" />
+        <argument
+            android:name="thumbPath"
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/editMarkerFragment"
         android:name="com.example.photoreminder.EditMarkerFragment"

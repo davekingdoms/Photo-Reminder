@@ -1,7 +1,9 @@
 [versions]
 agp = "8.8.2"
 cameraCore = "1.4.2"
+compiler = "4.14.2"
 datastorePreferences = "1.1.7"
+glideVersion = "4.16.0"
 kotlin = "2.1.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -20,9 +22,9 @@ playServicesMaps = "19.2.0"
 retrofitVersion = "2.9.0"
 secretsGradlePlugin = "2.0.1"
 squareupMoshi = "1.14.0"
-room = "2.7.1"
+room = "2.7.2"
 ksp = "2.1.0-1.0.28"
-workRuntimeKtx = "2.10.1"
+workRuntimeKtx = "2.10.2"
 legacySupportV4 = "1.0.0"
 
 [libraries]
@@ -33,6 +35,8 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePlugin" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
+github-glide = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

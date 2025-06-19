@@ -19,8 +19,8 @@ object RetrofitInstance {
     }
 
     private const val EMULATOR_IP = "http://10.0.2.2:5000/"
-    private const val SERVER_IP   = "http://192.168.1.91:5000/"
-    private val BASE_URL = if (
+    private const val SERVER_IP   = "http://10.46.49.197:5000/"
+    internal val BASE_URL = if (
         Build.FINGERPRINT.contains("generic")    || Build.MODEL.contains("Emulator") ||
         Build.MANUFACTURER.contains("Genymotion")|| Build.BRAND.contains("google") && Build.DEVICE.startsWith("generic") ||
         Build.PRODUCT.contains("sdk_gphone")     || Build.HARDWARE.contains("goldfish") ||

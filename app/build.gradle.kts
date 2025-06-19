@@ -46,6 +46,9 @@ android {
 }
 
 dependencies {
+    implementation (libs.github.glide)
+    annotationProcessor (libs.compiler)
+
     implementation (libs.androidx.datastore.preferences)
     implementation (libs.kotlinx.coroutines.core)
     implementation (libs.kotlinx.coroutines.android)
