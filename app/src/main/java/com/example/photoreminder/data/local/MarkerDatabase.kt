@@ -26,6 +26,7 @@ abstract class MarkerDatabase : RoomDatabase() {
                 )
                     .fallbackToDestructiveMigration()
                     .build()
+                    .also { INSTANCE = it }
 
             }
     }
