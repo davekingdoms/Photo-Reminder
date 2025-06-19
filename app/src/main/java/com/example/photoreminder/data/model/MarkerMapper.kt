@@ -18,7 +18,14 @@ fun MarkerDto.toEntity(): MarkerEntity = MarkerEntity(
     focalLength = focalLength ?: 0,
     tag         = tag,
     notes       = notes,
-    photos    = photos,
+    photos      = photoIds.map { pid ->
+        PhotoRef(
+            localUri  = null,
+            thumbPath = "",
+            remoteId  = pid,
+            synced    = false
+        )
+    },
     angle       = angle,
     createdAt   = createdAt,
     updatedAt   = updatedAt,
@@ -39,7 +46,7 @@ fun MarkerEntity.toDto(): MarkerDto = MarkerDto(
     focalLength = focalLength,
     tag         = tag,
     notes       = notes,
-    photos    = photos,
+    photoIds   = photos.mapNotNull { it.remoteId },
     angle       = angle,
     createdAt   = createdAt,
     updatedAt   = updatedAt,

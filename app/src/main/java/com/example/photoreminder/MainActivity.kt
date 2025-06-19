@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
                 ).build()
 
                 WorkManager.getInstance(this@MainActivity).enqueueUniquePeriodicWork(
-                    MarkerSyncWorker.UNIQUE_WORK_NAME,
+                    MarkerSyncWorker.QUEUE_PERIODIC,
                     ExistingPeriodicWorkPolicy.KEEP,
                     periodic
                 )

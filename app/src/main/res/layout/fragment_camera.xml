@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".CameraFragment" >
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/cameraToolbar"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
@@ -16,7 +16,9 @@
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIconTint="@color/white"
+        app:navigationIcon="@drawable/quantum_ic_arrow_back_grey600_24" />
 
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
@@ -50,9 +52,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
+        android:foregroundTint="@color/colorOnPrimary"
         android:scaleX="0.5"
         android:scaleY="0.5"
         android:src="@android:drawable/ic_menu_gallery"
+        android:tint="@color/white"
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:backgroundTintMode="add"
         app:layout_constraintBottom_toBottomOf="@+id/floatingActionButton"
         app:layout_constraintEnd_toStartOf="@+id/floatingActionButton"
         app:layout_constraintStart_toStartOf="parent"
