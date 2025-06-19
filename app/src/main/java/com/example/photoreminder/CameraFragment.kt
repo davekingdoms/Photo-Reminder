@@ -1,12 +1,9 @@
 package com.example.photoreminder
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,13 +11,15 @@ import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.appcompat.app.AlertDialog
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.File
+import java.util.*
 
 class CameraFragment : Fragment() {
 
@@ -31,9 +30,12 @@ class CameraFragment : Fragment() {
     }
 
     /* ---------- view refs ---------- */
-    private lateinit var previewView: PreviewView
-    private lateinit var captureButton: FloatingActionButton   // TODO
+    private lateinit var previewView  : PreviewView
+    private lateinit var captureButton: FloatingActionButton
     private lateinit var galleryButton: FloatingActionButton
+
+    /* ---------- CameraX ---------- */
+    private lateinit var imageCapture: ImageCapture
 
     /* ------------------------------------------------------------ */
     /* 1) Permesso fotocamera                                       */
@@ -102,28 +104,19 @@ class CameraFragment : Fragment() {
         /* click GALLERIA → photo-picker */
         galleryButton.setOnClickListener { launchPicker() }
 
-        /* captureButton rimane TODO */
+        /* click FOTOCAMERA → scatta e restituisci Uri */
+        captureButton.setOnClickListener { takePhoto() }
     }
 
     /* ------------------------------------------------------------ */
     /* Avvio del picker                                             */
     /* ------------------------------------------------------------ */
     private fun launchPicker() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            /* Nuovo Photo Picker: solo immagini, multipla illimitata */
-            val req = PickVisualMediaRequest.Builder()
-                .setMediaType(PickVisualMedia.ImageOnly)
-                .build()
-            pickImagesLauncher.launch(req)
-        } else {
-            /* SAF multipla */
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "image/*"
-                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            }
-            openDocLauncher.launch(intent)
-        }
+        /* Nuovo Photo Picker: solo immagini, multi illimitata */
+        val req = PickVisualMediaRequest.Builder()
+            .setMediaType(PickVisualMedia.ImageOnly)
+            .build()
+        pickImagesLauncher.launch(req)
     }
 
     /* ------------------------------------------------------------ */
@@ -143,20 +136,61 @@ class CameraFragment : Fragment() {
     }
 
     /* ------------------------------------------------------------ */
-    /* Camera preview                                               */
+    /* Camera preview + ImageCapture                                */
     /* ------------------------------------------------------------ */
     private fun startCamera() {
         val provFuture = ProcessCameraProvider.getInstance(requireContext())
         provFuture.addListener({
             val provider = provFuture.get()
+
+            /* Preview */
             val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
+                it.surfaceProvider = previewView.surfaceProvider
             }
+
+            /* ImageCapture con rotazione corretta */
+            imageCapture = ImageCapture.Builder()
+                .setTargetRotation(previewView.display.rotation)
+                .build()
+
             provider.unbindAll()
             provider.bindToLifecycle(
-                viewLifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview
+                viewLifecycleOwner,
+                CameraSelector.DEFAULT_BACK_CAMERA,
+                preview,
+                imageCapture
             )
         }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
+    /* ------------------------------------------------------------ */
+    /* Scatto foto                                                  */
+    /* ------------------------------------------------------------ */
+    private fun takePhoto() {
+        /* temp file in cacheDir/captures */
+        val file = File(
+            File(requireContext().cacheDir, "captures").apply { mkdirs() },
+            "CAP_${UUID.randomUUID()}.jpg"
+        )
+        val output = ImageCapture.OutputFileOptions.Builder(file).build()
+
+        imageCapture.takePicture(
+            output,
+            ContextCompat.getMainExecutor(requireContext()),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onError(exc: ImageCaptureException) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Errore scatto: ${exc.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                override fun onImageSaved(out: ImageCapture.OutputFileResults) {
+                    /* Ri-usa la stessa pipeline del picker */
+                    returnWithUris(listOf(file.toUri()))
+                }
+            }
+        )
     }
 
     /* ------------------------------------------------------------ */
