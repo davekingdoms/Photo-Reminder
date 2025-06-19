@@ -21,6 +21,14 @@ import com.example.photoreminder.data.sync.MarkerSyncWorker
 import com.example.photoreminder.databinding.FragmentLoginBinding
 import com.example.photoreminder.ui.login.LoginViewModel
 import kotlinx.coroutines.launch
+import androidx.core.content.edit
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import com.example.photoreminder.data.sync.PhotoSyncWorker
+import com.google.android.datatransport.cct.internal.NetworkConnectionInfo
+import java.util.concurrent.TimeUnit
 
 
 class LoginFragment : Fragment() {
@@ -84,49 +92,79 @@ class LoginFragment : Fragment() {
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         if (token != null) {
+                            // Salvo token e username
                             DataStoreManager.saveToken(requireContext(), token)
-                            Log.d("TOKEN", "Token: $token")
                             DataStoreManager.saveUsername(requireContext(), username)
 
+                            // Reset last_sync_time
                             requireContext()
                                 .getSharedPreferences("marker_sync_prefs", Context.MODE_PRIVATE)
-                                .edit()
-                                .putLong("last_sync_time_${username}", 0L)
-                                .apply()
+                                .edit {
+                                    putLong("last_sync_time_$username", 0L)
+                                }
 
-                            val oneTime = OneTimeWorkRequestBuilder<MarkerSyncWorker>()
+                            // Preparo i due WorkRequest
+                            val markerReq = OneTimeWorkRequestBuilder<MarkerSyncWorker>()
                                 .setInputData(workDataOf("isManual" to true))
+                                .setConstraints(
+                                    Constraints.Builder()
+                                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                                        .build()
+                                )
+                                .setBackoffCriteria(
+                                    BackoffPolicy.EXPONENTIAL,
+                                    30, TimeUnit.SECONDS
+                                )
                                 .build()
 
+                            val photoReq = OneTimeWorkRequestBuilder<PhotoSyncWorker>()
+                                .setConstraints(
+                                    Constraints.Builder()
+                                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                                        .build()
+                                )
+                                .setBackoffCriteria(
+                                    BackoffPolicy.EXPONENTIAL,
+                                    30, TimeUnit.SECONDS
+                                )
+                                .build()
+
+                            // Lancio la catena: marker → foto
                             val wm = WorkManager.getInstance(requireContext())
-                            wm.enqueue(oneTime)
-                            wm.getWorkInfoByIdLiveData(oneTime.id)
-                                .observe(viewLifecycleOwner) { info ->
-                                    info?.let { wi ->
-                                        if (wi.state.isFinished) {
-                                            val msg = wi.outputData.getString("message")
-                                                ?: wi.outputData.getString("errorMessage")
-                                            if (!msg.isNullOrBlank()) {
-                                                Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
-                                            }
+                            wm.beginUniqueWork(
+                                MarkerSyncWorker.UNIQUE_WORK_NAME,
+                                ExistingWorkPolicy.REPLACE,
+                                markerReq
+                            )
+                                .then(photoReq)
+                                .enqueue()
+
+                            // Osservo lo stato della coda unica per dare feedback all'utente
+                            wm.getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.UNIQUE_WORK_NAME)
+                                .observe(viewLifecycleOwner) { infos ->
+                                    val info = infos.firstOrNull() ?: return@observe
+                                    if (info.state.isFinished) {
+                                        val msg = info.outputData.getString("message")
+                                            ?: info.outputData.getString("errorMessage")
+                                        if (!msg.isNullOrBlank()) {
+                                            Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
                                         }
                                     }
                                 }
 
-
+                            // Navigo a Home
                             findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                             loginViewModel.clearLoginResponse()
                         }
                     }
-
-
-
                 } else {
+                    // gestione errore login
                     val errorBody = it.errorBody()?.string()
                     Toast.makeText(requireContext(), "Login error: $errorBody", Toast.LENGTH_LONG).show()
                 }
             }
         }
+
     }
 
     override fun onDestroyView() {

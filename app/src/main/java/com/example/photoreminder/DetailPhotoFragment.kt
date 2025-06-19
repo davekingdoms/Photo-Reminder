@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.photoreminder.data.local.MarkerDatabase
@@ -20,6 +21,7 @@ import com.example.photoreminder.data.local.MarkerEntity
 import com.example.photoreminder.data.repository.MarkerRepository
 import com.example.photoreminder.data.sync.MarkerSyncWorker
 import com.example.photoreminder.databinding.FragmentDetailPhotoBinding
+import com.example.photoreminder.ui.adapter.ThumbnailAdapter
 import com.example.photoreminder.ui.viewmodel.MarkerViewModel
 import com.example.photoreminder.ui.viewmodel.MarkerViewModelFactory
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -44,6 +46,7 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
 
     // Il marker caricato dal database
     private var currentMarker: MarkerEntity? = null
+    private val thumbAdapter by lazy { ThumbnailAdapter() }
 
     // ViewModel per operazioni locali (delete, ecc.)
     private val viewModel: MarkerViewModel by lazy {
@@ -75,6 +78,12 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
 
         // Carica i dettagli del marker da Room
         loadMarkerDetails(args.id)
+        binding.thumbRecyclerView.apply {
+            adapter = thumbAdapter
+            layoutManager = LinearLayoutManager(
+                requireContext(), LinearLayoutManager.HORIZONTAL, false
+            )
+        }
 
         // Delete button
         binding.deleteButton.setOnClickListener {
@@ -138,6 +147,7 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
                 currentMarker = marker
                 launch(Dispatchers.Main) {
                     populateFields(marker)
+                    thumbAdapter.submit(marker.photos.map { it.thumbPath })
                     if (mapIsReady) {
                         drawMarkerOnMap(marker)
                     }

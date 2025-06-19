@@ -24,7 +24,9 @@ abstract class MarkerDatabase : RoomDatabase() {
                     MarkerDatabase::class.java,
                     "marker_database"
                 )
+                    .fallbackToDestructiveMigration()
                     .build()
+
             }
     }
 }

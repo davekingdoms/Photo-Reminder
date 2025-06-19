@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -11,9 +12,11 @@ import androidx.work.*
 import com.example.photoreminder.data.datastore.DataStoreManager
 import com.example.photoreminder.data.local.MarkerDatabase
 import com.example.photoreminder.data.sync.MarkerSyncWorker
+import com.example.photoreminder.data.sync.PhotoSyncWorker
 import com.example.photoreminder.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+
 
 class HomeFragment : Fragment() {
 
@@ -39,30 +42,34 @@ class HomeFragment : Fragment() {
                 val ctx = requireContext()
                 val username = DataStoreManager.getUsername(ctx)
 
-                /* 1) rimuovi il timestamp di lastSync PRIMA di cancellare lo user */
+                // 1) azzera il timestamp lastSync
                 ctx.getSharedPreferences("marker_sync_prefs", Context.MODE_PRIVATE)
-                    .edit()
-                    .remove("last_sync_time_${username}")
-                    .apply()
+                    .edit { remove("last_sync_time_${'$'}username") }
 
-                /* 2) cancella credenziali + DB */
+                // 2) cancella credenziali + DB locale
                 DataStoreManager.clearToken(ctx)
                 DataStoreManager.clearUsername(ctx)
                 MarkerDatabase.getDatabase(ctx).markerDao().clearAllMarkers()
 
-                /* 3) torna al login */
+                // 3) annulla i worker
+                WorkManager.getInstance(ctx).apply {
+                    cancelUniqueWork(MarkerSyncWorker.QUEUE_MANUAL)
+                    cancelUniqueWork(MarkerSyncWorker.QUEUE_PERIODIC)
+                }
+
+                // 4) torna al login
                 findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
             }
         }
 
-        /* ---------- observer unico sullo stato della sync ---------- */
+        /* ---------- observer sullo stato della sync MANUALE ---------- */
         WorkManager.getInstance(requireContext())
-            .getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.UNIQUE_WORK_NAME)
+            .getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.QUEUE_MANUAL)
             .observe(viewLifecycleOwner) { infos ->
                 val info = infos.firstOrNull() ?: return@observe
                 if (info.state.isFinished) {
-                    val msg = info.outputData.getString("message")
-                        ?: info.outputData.getString("errorMessage")
+                    val data = info.outputData
+                    val msg = data.getString("message") ?: data.getString("errorMessage")
                     if (!msg.isNullOrBlank())
                         Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
                 }
@@ -84,9 +91,9 @@ class HomeFragment : Fragment() {
 
     private fun enqueueManualSync() {
         val ctx = requireContext()
-        val wm  = WorkManager.getInstance(ctx)
+        val wm = WorkManager.getInstance(ctx)
 
-        val req = OneTimeWorkRequestBuilder<MarkerSyncWorker>()
+        val markerReq = OneTimeWorkRequestBuilder<MarkerSyncWorker>()
             .setInputData(workDataOf("isManual" to true))
             .setConstraints(
                 Constraints.Builder()
@@ -99,19 +106,30 @@ class HomeFragment : Fragment() {
             )
             .build()
 
-        /* serializza i job con nome univoco */
-        wm.enqueueUniqueWork(
-            MarkerSyncWorker.UNIQUE_WORK_NAME,
-            ExistingWorkPolicy.REPLACE,
-            req
-        )
+        val photoReq = OneTimeWorkRequestBuilder<PhotoSyncWorker>()
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                30, TimeUnit.SECONDS
+            )
+            .build()
 
-        /* se una sync è già RUNNING, avvisa subito l’utente */
-        val alreadyRunning = wm.getWorkInfosForUniqueWork(MarkerSyncWorker.UNIQUE_WORK_NAME)
-            .get() // blocca pochi ms fuori main-thread
-            .any { it.state == WorkInfo.State.RUNNING && it.id != req.id }
+        // serializza i job nella coda MANUAL
+        wm.beginUniqueWork(
+            MarkerSyncWorker.QUEUE_MANUAL,
+            ExistingWorkPolicy.REPLACE,
+            markerReq
+        ).then(photoReq).enqueue()
+
+        // feedback immediato se è già in RUNNING
+        val infos = wm.getWorkInfosForUniqueWork(MarkerSyncWorker.QUEUE_MANUAL).get()
+        val alreadyRunning = infos.any { it.state == WorkInfo.State.RUNNING }
         if (alreadyRunning) {
-            Toast.makeText(ctx, "Sincronizzazione già in corso…", Toast.LENGTH_SHORT).show()
+            Toast.makeText(ctx, "Sync in progress...", Toast.LENGTH_SHORT).show()
         }
     }
 

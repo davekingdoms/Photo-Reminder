@@ -7,7 +7,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.DocumentsContract
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.*
@@ -22,29 +24,33 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class CameraFragment : Fragment() {
 
-    /* ===== chiavi per il risultato ===== */
+    /* ===== chiavi per il risultato verso AddPhotoMarkerFragment ===== */
     companion object {
-        const val RESULT_KEY  = "photosResult"
-        const val BUNDLE_URIS = "uris"
+        const val RESULT_KEY  = "photosResult"   // requestKey
+        const val BUNDLE_URIS = "uris"           // arrayList<String>
     }
 
+    /* ---------- view refs ---------- */
     private lateinit var previewView: PreviewView
-    private lateinit var captureButton: FloatingActionButton
+    private lateinit var captureButton: FloatingActionButton   // TODO
     private lateinit var galleryButton: FloatingActionButton
 
     /* ------------------------------------------------------------ */
-    /* 1) PERMESSO FOTOCAMERA                                       */
+    /* 1) Permesso fotocamera                                       */
     /* ------------------------------------------------------------ */
     private val cameraPermission = Manifest.permission.CAMERA
     private val requestPermissionLauncher =
         registerForActivityResult(RequestPermission()) { granted ->
             if (granted) startCamera()
-            else Toast.makeText(requireContext(),
-                "Permesso fotocamera negato", Toast.LENGTH_SHORT).show()
+            else Toast.makeText(
+                requireContext(),
+                "Permesso fotocamera negato",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
     /* ------------------------------------------------------------ */
-    /* 2) PHOTO PICKER API 33+ (selezione multipla)                  */
+    /* 2) Photo Picker API 33+ (selezione multipla)                  */
     /* ------------------------------------------------------------ */
     private val pickImagesLauncher =
         registerForActivityResult(PickMultipleVisualMedia()) { uris: List<Uri> ->
@@ -52,7 +58,7 @@ class CameraFragment : Fragment() {
         }
 
     /* ------------------------------------------------------------ */
-    /* 3) FALLBACK ACTION_OPEN_DOCUMENT (multi-select)               */
+    /* 3) Fallback SAF (multi-select)                               */
     /* ------------------------------------------------------------ */
     private val openDocLauncher =
         registerForActivityResult(StartActivityForResult()) { res ->
@@ -60,10 +66,10 @@ class CameraFragment : Fragment() {
                 val data = res.data ?: return@registerForActivityResult
                 val uris = mutableListOf<Uri>()
 
+                /* ClipData multipla */
                 data.clipData?.let { clip ->
-                    for (i in 0 until clip.itemCount)
-                        uris += clip.getItemAt(i).uri
-                } ?: data.data?.let { uris += it }
+                    for (i in 0 until clip.itemCount) uris += clip.getItemAt(i).uri
+                } ?: data.data?.let { uris += it }   // selezione singola
 
                 if (uris.isNotEmpty()) returnWithUris(uris)
             }
@@ -73,24 +79,27 @@ class CameraFragment : Fragment() {
     /* Ciclo vita                                                   */
     /* ------------------------------------------------------------ */
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, saved: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View =
         inflater.inflate(R.layout.fragment_camera, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        previewView    = view.findViewById(R.id.previewView)
-        captureButton  = view.findViewById(R.id.floatingActionButton)
-        galleryButton  = view.findViewById(R.id.floatingActionButton2)
+        previewView   = view.findViewById(R.id.previewView)
+        captureButton = view.findViewById(R.id.floatingActionButton)
+        galleryButton = view.findViewById(R.id.floatingActionButton2)
 
         /* permesso fotocamera */
         when {
             ContextCompat.checkSelfPermission(requireContext(), cameraPermission)
                     == PackageManager.PERMISSION_GRANTED -> startCamera()
-            shouldShowRequestPermissionRationale(cameraPermission) -> showPermissionRationale()
-            else -> requestPermissionLauncher.launch(cameraPermission)
+            shouldShowRequestPermissionRationale(cameraPermission) ->
+                showPermissionRationale()
+            else ->
+                requestPermissionLauncher.launch(cameraPermission)
         }
 
-        /* click GALLERY → photo-picker */
+        /* click GALLERIA → photo-picker */
         galleryButton.setOnClickListener { launchPicker() }
 
         /* captureButton rimane TODO */
@@ -101,7 +110,7 @@ class CameraFragment : Fragment() {
     /* ------------------------------------------------------------ */
     private fun launchPicker() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            /* Nuovo Photo Picker: chiede solo immagini, multipla illimitata */
+            /* Nuovo Photo Picker: solo immagini, multipla illimitata */
             val req = PickVisualMediaRequest.Builder()
                 .setMediaType(PickVisualMedia.ImageOnly)
                 .build()
@@ -134,7 +143,7 @@ class CameraFragment : Fragment() {
     }
 
     /* ------------------------------------------------------------ */
-    /* Camera preview (com'era)                                     */
+    /* Camera preview                                               */
     /* ------------------------------------------------------------ */
     private fun startCamera() {
         val provFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -150,6 +159,9 @@ class CameraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
+    /* ------------------------------------------------------------ */
+    /* Dialog permesso fotocamera                                   */
+    /* ------------------------------------------------------------ */
     private fun showPermissionRationale() {
         AlertDialog.Builder(requireContext())
             .setTitle("Permesso Fotocamera Necessario")

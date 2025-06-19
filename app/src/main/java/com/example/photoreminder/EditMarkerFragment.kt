@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import androidx.core.graphics.scale
 
 class EditMarkerFragment : Fragment(), OnMapReadyCallback {
 
@@ -71,7 +72,7 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
 
         /* ---------- observer unico sul worker ---------- */
         WorkManager.getInstance(requireContext())
-            .getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.UNIQUE_WORK_NAME)
+            .getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.QUEUE_MANUAL)
             .observe(viewLifecycleOwner) { infos ->
                 val info = infos.firstOrNull() ?: return@observe
                 if (info.state.isFinished) {
@@ -208,7 +209,7 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
             .build()
 
         WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-            MarkerSyncWorker.UNIQUE_WORK_NAME,
+            MarkerSyncWorker.QUEUE_MANUAL,
             ExistingWorkPolicy.KEEP,
             req
         )
@@ -241,8 +242,7 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun drawMarker(m: MarkerEntity) {
-        val bmp = Bitmap.createScaledBitmap(
-            BitmapFactory.decodeResource(resources, R.drawable.icon_fov),
+        val bmp = BitmapFactory.decodeResource(resources, R.drawable.icon_fov).scale(
             (48 * resources.displayMetrics.density).toInt(),
             (48 * resources.displayMetrics.density).toInt(),
             false
