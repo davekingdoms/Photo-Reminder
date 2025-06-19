@@ -132,7 +132,7 @@ class LoginFragment : Fragment() {
                             // Lancio la catena: marker → foto
                             val wm = WorkManager.getInstance(requireContext())
                             wm.beginUniqueWork(
-                                MarkerSyncWorker.UNIQUE_WORK_NAME,
+                                MarkerSyncWorker.QUEUE_MANUAL,
                                 ExistingWorkPolicy.REPLACE,
                                 markerReq
                             )
@@ -140,7 +140,7 @@ class LoginFragment : Fragment() {
                                 .enqueue()
 
                             // Osservo lo stato della coda unica per dare feedback all'utente
-                            wm.getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.UNIQUE_WORK_NAME)
+                            wm.getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.QUEUE_MANUAL)
                                 .observe(viewLifecycleOwner) { infos ->
                                     val info = infos.firstOrNull() ?: return@observe
                                     if (info.state.isFinished) {
@@ -149,6 +149,7 @@ class LoginFragment : Fragment() {
                                         if (!msg.isNullOrBlank()) {
                                             Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
                                         }
+                                        WorkManager.getInstance(requireContext()).pruneWork()
                                     }
                                 }
 

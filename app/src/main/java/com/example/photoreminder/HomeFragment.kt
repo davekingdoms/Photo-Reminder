@@ -15,6 +15,7 @@ import com.example.photoreminder.data.sync.MarkerSyncWorker
 import com.example.photoreminder.data.sync.PhotoSyncWorker
 import com.example.photoreminder.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 
@@ -50,6 +51,10 @@ class HomeFragment : Fragment() {
                 DataStoreManager.clearToken(ctx)
                 DataStoreManager.clearUsername(ctx)
                 MarkerDatabase.getDatabase(ctx).markerDao().clearAllMarkers()
+                MarkerDatabase.getDatabase(ctx).close()
+                ctx.deleteDatabase("marker_database")
+                File(ctx.filesDir, "thumbnails")
+                    .deleteRecursively()
 
                 // 3) annulla i worker
                 WorkManager.getInstance(ctx).apply {
@@ -70,8 +75,10 @@ class HomeFragment : Fragment() {
                 if (info.state.isFinished) {
                     val data = info.outputData
                     val msg = data.getString("message") ?: data.getString("errorMessage")
-                    if (!msg.isNullOrBlank())
+                    if (!msg.isNullOrBlank()) {
                         Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
+                    }
+                    WorkManager.getInstance(requireContext()).pruneWork()
                 }
             }
 
