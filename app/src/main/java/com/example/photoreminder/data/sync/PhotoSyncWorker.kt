@@ -15,6 +15,7 @@ import okhttp3.ResponseBody
 import java.io.File
 import java.io.FileOutputStream
 import androidx.core.graphics.scale
+import kotlin.math.roundToInt
 
 class PhotoSyncWorker(
     appContext: Context,
@@ -57,10 +58,10 @@ class PhotoSyncWorker(
 
                 // 4a) Decodifica e ridimensiona in memoria
                 val originalBmp = BitmapFactory.decodeStream(inputStream)
-                val targetH = 200
-                val ratio = targetH.toFloat() / originalBmp.height
-                val targetW = (originalBmp.width * ratio).toInt()
-                val thumbBmp = originalBmp.scale(targetW, targetH)
+                val targetHpx = (60 * applicationContext.resources.displayMetrics.density).roundToInt()
+                val ratio     = targetHpx.toFloat() / originalBmp.height
+                val targetW   = (originalBmp.width * ratio).toInt()
+                val thumbBmp  = originalBmp.scale(targetW, targetHpx)
                 originalBmp.recycle()
 
                 // 4b) Salva su disco

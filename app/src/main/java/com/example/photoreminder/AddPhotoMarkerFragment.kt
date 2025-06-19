@@ -262,30 +262,34 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
     /* ============== Thumbnail helper ============== */
     private suspend fun createThumbnail(uri: Uri, markerId: String): String =
         withContext(Dispatchers.IO) {
-            val targetH = 200
+
+            /* ---- new: height in px from 60 dp ---- */
+            val targetHpx = (60 * resources.displayMetrics.density).roundToInt()
+
+            /*   keep the rest identical, using targetHpx instead of 200  */
             val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             requireContext().contentResolver.openInputStream(uri)?.use {
                 BitmapFactory.decodeStream(it, null, opts)
             }
-            opts.inSampleSize = (opts.outHeight / targetH).coerceAtLeast(1)
+            opts.inSampleSize = (opts.outHeight / targetHpx).coerceAtLeast(1)
             opts.inJustDecodeBounds = false
 
             val bmp = requireContext().contentResolver.openInputStream(uri)?.use {
                 BitmapFactory.decodeStream(it, null, opts)
             } ?: error("decode failed")
 
-            val ratio   = targetH.toFloat() / bmp.height
+            val ratio   = targetHpx.toFloat() / bmp.height
             val widthPx = (bmp.width * ratio).roundToInt()
-            val thumb   = bmp.scale(widthPx, targetH)
+            val thumb   = bmp.scale(widthPx, targetHpx)
 
-            val dir = File(requireContext().filesDir, "thumbnails/$markerId").apply { mkdirs() }
+            val dir  = File(requireContext().filesDir, "thumbnails/$markerId").apply { mkdirs() }
             val file = File(dir, "${UUID.randomUUID()}.jpg")
             FileOutputStream(file).use { thumb.compress(Bitmap.CompressFormat.JPEG, 85, it) }
 
             bmp.recycle(); if (thumb !== bmp) thumb.recycle()
-            Log.d("Thumbnail", "Saved -> ${file.absolutePath}")
             file.absolutePath
         }
+
 
     /* ============ lifecycle MapView ============ */
     override fun onStart()  { super.onStart();  binding.mapViewMarker.onStart() }

@@ -83,6 +83,7 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
                         Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
 
                     /* torna alla mappa centrata sul marker appena editato */
+                    WorkManager.getInstance(requireContext()).pruneWork()
                     currentMarker?.let {
                         val action =
                             EditMarkerFragmentDirections
