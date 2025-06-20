@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import androidx.core.graphics.scale
 
 class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
 
@@ -174,8 +175,7 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
 
     private fun drawMarkerOnMap(marker: MarkerEntity) {
         val pos = LatLng(marker.lat, marker.lng)
-        val bmp = Bitmap.createScaledBitmap(
-            BitmapFactory.decodeResource(resources, R.drawable.icon_fov),
+        val bmp = BitmapFactory.decodeResource(resources, R.drawable.icon_fov).scale(
             (48 * resources.displayMetrics.density).roundToInt(),
             (48 * resources.displayMetrics.density).roundToInt(),
             false

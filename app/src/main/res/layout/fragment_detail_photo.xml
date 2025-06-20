@@ -38,23 +38,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/detailPhotoMarkerToolBar">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/markerDetailMapView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:contentDescription="Visualize marker in map"
+            app:circularflow_radiusInDP="20dp" />
 
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/markerDetailMapView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:contentDescription="Visualize marker in map"
-                app:circularflow_radiusInDP="20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
     <Button
@@ -339,7 +329,6 @@
                     android:layout_marginStart="24dp"
                     android:layout_marginEnd="24dp"
                     android:editable="false"
-                    android:hint="Insert note..."
                     android:inputType="textMultiLine"
                     android:maxLines="6"
                     android:minHeight="48dp"

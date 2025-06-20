@@ -61,17 +61,17 @@ class LoginFragment : Fragment() {
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val username = binding.usernamEditText.text.toString()
+                val username = binding.usernameEditText.text.toString()
                 val password = binding.passwordEditText.text.toString()
                 binding.loginButton.isEnabled = username.isNotEmpty() && password.isNotEmpty()
             }
             override fun afterTextChanged(s: Editable?) {}
         }
-        binding.usernamEditText.addTextChangedListener(textWatcher)
+        binding.usernameEditText.addTextChangedListener(textWatcher)
         binding.passwordEditText.addTextChangedListener(textWatcher)
 
         binding.loginButton.setOnClickListener {
-            val username = binding.usernamEditText.text.toString().trim()
+            val username = binding.usernameEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
             loginViewModel.doLogin(username, password)
         }
@@ -88,7 +88,7 @@ class LoginFragment : Fragment() {
                 if (it.isSuccessful) {
                     val authResponse = it.body()
                     val token = authResponse?.token
-                    val username = binding.usernamEditText.text.toString().trim()
+                    val username = binding.usernameEditText.text.toString().trim()
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         if (token != null) {
