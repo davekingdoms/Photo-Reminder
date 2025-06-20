@@ -32,6 +32,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import androidx.core.graphics.scale
+import com.example.photoreminder.data.sync.PhotoSyncWorker
 
 class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
 
@@ -209,6 +210,8 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
 
     /* ---------- enqueue sync manuale ---------- */
     private fun enqueueSync() {
+        val ctx = requireContext()
+        val wm = WorkManager.getInstance(ctx)
         val req = OneTimeWorkRequestBuilder<MarkerSyncWorker>()
             .setInputData(workDataOf("isManual" to true))
             .setConstraints(
@@ -219,11 +222,21 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
             .build()
 
-        WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-            MarkerSyncWorker.QUEUE_MANUAL,
+        val photoReq = OneTimeWorkRequestBuilder<PhotoSyncWorker>()
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                30, TimeUnit.SECONDS
+            )
+            .build()
+        wm.beginUniqueWork(MarkerSyncWorker.QUEUE_MANUAL,
             ExistingWorkPolicy.KEEP,
-            req
-        )
+            req).then(photoReq).enqueue()
+
     }
 
     /* ================= MAPPA ================= */
@@ -263,8 +276,8 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
     private suspend fun createThumbnail(uri: Uri, markerId: String): String =
         withContext(Dispatchers.IO) {
 
-            /* ---- new: height in px from 60 dp ---- */
-            val targetHpx = (60 * resources.displayMetrics.density).roundToInt()
+            /* ---- new: height in px from 170 dp ---- */
+            val targetHpx = (170 * resources.displayMetrics.density).roundToInt()
 
             /*   keep the rest identical, using targetHpx instead of 200  */
             val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }

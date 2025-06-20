@@ -264,11 +264,19 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
 
     override fun onResume()  { super.onResume();  binding.mapViewEditFragment.onResume() }
     override fun onPause()   { binding.mapViewEditFragment.onPause();   super.onPause() }
-    override fun onDestroy() { binding.mapViewEditFragment.onDestroy(); super.onDestroy() }
+    // MOVED THIS LINE FROM onDestroy() to onDestroyView()
+    // override fun onDestroy() { binding.mapViewEditFragment.onDestroy(); super.onDestroy() }
     override fun onLowMemory() { super.onLowMemory(); binding.mapViewEditFragment.onLowMemory() }
 
     override fun onDestroyView() {
+        binding.mapViewEditFragment.onDestroy() // THIS IS THE CHANGE!
         _binding = null
         super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        // The call to binding.mapViewEditFragment.onDestroy() has been moved
+        // to onDestroyView().
+        super.onDestroy()
     }
 }

@@ -58,7 +58,7 @@ class PhotoSyncWorker(
 
                 // 4a) Decodifica e ridimensiona in memoria
                 val originalBmp = BitmapFactory.decodeStream(inputStream)
-                val targetHpx = (60 * applicationContext.resources.displayMetrics.density).roundToInt()
+                val targetHpx = (170 * applicationContext.resources.displayMetrics.density).roundToInt()
                 val ratio     = targetHpx.toFloat() / originalBmp.height
                 val targetW   = (originalBmp.width * ratio).toInt()
                 val thumbBmp  = originalBmp.scale(targetW, targetHpx)
