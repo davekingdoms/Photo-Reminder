@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class MarkerRepository(
     private val dao: MarkerDao
 ) {
-    /* tutti i marker (la UI filtra quelli deleted) */
+
     fun observeAll(): Flow<List<MarkerEntity>> = dao.observeMarkers()
 
     suspend fun getPendingForSync(): List<MarkerEntity> = dao.getPending()

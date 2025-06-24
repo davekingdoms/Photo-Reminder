@@ -21,7 +21,6 @@ class ListPhotoFragment : Fragment() {
     private var _binding: FragmentListPhotoBinding? = null
     private val binding get() = _binding!!
 
-    /* ViewModel */
     private val viewModel: MarkerViewModel by viewModels {
         MarkerViewModelFactory(
             MarkerRepository(
@@ -30,7 +29,6 @@ class ListPhotoFragment : Fragment() {
         )
     }
 
-    /* Adapters */
     private lateinit var tagAdapter: TagAdapter
     private lateinit var markerAdapter: MarkerListAdapter
 
@@ -48,12 +46,10 @@ class ListPhotoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /* Toolbar back */
         binding.materialToolbar3.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 
-        /* Tag Recycler (orizzontale) */
         tagAdapter = TagAdapter(listOf("All"), "All") { tag ->
             selectedTag = tag
             refreshList()
@@ -64,7 +60,6 @@ class ListPhotoFragment : Fragment() {
             adapter = tagAdapter
         }
 
-        /* Marker Recycler (verticale) */
         markerAdapter = MarkerListAdapter { marker ->
             val action = ListPhotoFragmentDirections
                 .actionListPhotoFragmentToDetailPhotoFragment(marker.id)
@@ -75,15 +70,12 @@ class ListPhotoFragment : Fragment() {
             adapter = markerAdapter
         }
 
-        /* Osserva Room */
         viewModel.markers.observe(viewLifecycleOwner) { list ->
             allMarkers = list.filterNot { it.syncStatus == SyncStatus.PENDING_DELETE }
             updateTagBar()
             refreshList()
         }
     }
-
-    /* ---------------- helper ---------------- */
 
     private fun updateTagBar() {
         val genres = allMarkers.mapNotNull { it.genre.ifBlank { null } }

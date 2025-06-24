@@ -1,7 +1,6 @@
 package com.example.photoreminder
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -38,20 +37,16 @@ import androidx.core.graphics.scale
 
 class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
 
-    /* ---------------- binding & args ---------------- */
     private var _binding: FragmentDetailPhotoBinding? = null
     private val binding get() = _binding!!
     private val args: DetailPhotoFragmentArgs by navArgs()
 
-    /* ---------------- map ---------------- */
     private lateinit var googleMap: GoogleMap
     private var mapIsReady = false
     private lateinit var photoMarker: Marker
 
-    /* ---------------- data ---------------- */
     private var currentMarker: MarkerEntity? = null
 
-    /* ---------------- adapter ---------------- */
     private val thumbAdapter by lazy {
         ThumbnailAdapter { pr, _ ->
             val action =
@@ -64,14 +59,12 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    /* ---------------- view-model ---------------- */
     private val viewModel: MarkerViewModel by lazy {
         val dao = MarkerDatabase.getDatabase(requireContext()).markerDao()
         MarkerViewModelFactory(MarkerRepository(dao))
             .create(MarkerViewModel::class.java)
     }
 
-    /* ---------------- lifecycle ---------------- */
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -84,16 +77,13 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /* Toolbar back */
         binding.detailPhotoMarkerToolBar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 
-        /* MapView */
         binding.markerDetailMapView.onCreate(savedInstanceState)
         binding.markerDetailMapView.getMapAsync(this)
 
-        /* Thumbnails Recycler */
         binding.thumbRecyclerView.apply {
             adapter = thumbAdapter
             layoutManager = LinearLayoutManager(
@@ -101,15 +91,11 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
             )
         }
 
-        /* Carica dati marker */
         loadMarkerDetails(args.id)
 
-        /* Pulsanti */
         setUpDeleteButton()
         setUpEditButton()
     }
-
-    /* ---------------- caricamento dati ---------------- */
 
     private fun loadMarkerDetails(id: String) {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -119,7 +105,7 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
                 currentMarker = marker
                 launch(Dispatchers.Main) {
                     populateFields(marker)
-                    thumbAdapter.submit(marker.photos)          // lista PhotoRef
+                    thumbAdapter.submit(marker.photos)
                     if (mapIsReady) drawMarkerOnMap(marker)
                 }
             } else {
@@ -131,13 +117,10 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    /* ---------------- UI ---------------- */
-
     @SuppressLint("SetTextI18n")
     private fun populateFields(marker: MarkerEntity) = with(binding) {
         nameDetailFragmentTextView.text = marker.title
 
-        /* Genre + icona */
         genreDetailFragmentTextView.text = marker.genre
         val iconRes = when (marker.genre.lowercase()) {
             "street"     -> R.drawable.street_icon
@@ -150,7 +133,7 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
             "star trail" -> R.drawable.star_trail_icon
             else         -> R.drawable.street_icon
         }
-        genreIconImageView.setImageDrawable(
+        genreIconDetailFragmentImageView.setImageDrawable(
             ResourcesCompat.getDrawable(resources, iconRes, null)
         )
 
@@ -159,10 +142,12 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         isoDetailFragmentTextView.text   = marker.iso
         focalLenDetailFragmentTextView.text = marker.focalLength.toString()
         tagDetailFragmentTextView.text     = marker.tag
-        noteEditText.setText(marker.notes)
-    }
+        if (!marker.notes.isNullOrBlank()) {
+            noteEditText.visibility = View.VISIBLE
+            noteEditText.text = marker.notes
+        }
 
-    /* ---------------- Map ---------------- */
+    }
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
@@ -171,6 +156,14 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         googleMap.uiSettings.isCompassEnabled = false
         googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
         currentMarker?.let { drawMarkerOnMap(it) }
+        binding.mapTypeDetailFAB.setOnClickListener {
+            googleMap.mapType =
+                if (googleMap.mapType == GoogleMap.MAP_TYPE_NORMAL)
+                    GoogleMap.MAP_TYPE_HYBRID else GoogleMap.MAP_TYPE_NORMAL
+        }
+        binding.threeDimensionalDetailFab.setOnClickListener {
+            googleMap.isBuildingsEnabled = !googleMap.isBuildingsEnabled
+        }
     }
 
     private fun drawMarkerOnMap(marker: MarkerEntity) {
@@ -192,18 +185,16 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 18f))
     }
 
-    /* ---------------- Delete ---------------- */
-
     private fun setUpDeleteButton() {
         binding.deleteButton.setOnClickListener {
             currentMarker?.let { marker ->
                 androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                    .setTitle("Conferma Eliminazione")
+                    .setTitle("Delete marker")
                     .setMessage(
-                        "Sei sicuro di voler eliminare questo marker? " +
-                                "L'eliminazione verrà sincronizzata con il server."
+                        "Are you sure you want to delete this marker?" +
+                                "The deleted marker cannot be recovered."
                     )
-                    .setPositiveButton("Elimina") { _, _ ->
+                    .setPositiveButton("Delete") { _, _ ->
                         viewModel.deleteMarker(marker.id)
 
                         val req = OneTimeWorkRequestBuilder<MarkerSyncWorker>().build()
@@ -222,13 +213,13 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
                                         else if (it.state == androidx.work.WorkInfo.State.SUCCEEDED)
                                             Toast.makeText(
                                                 requireContext(),
-                                                "Marker eliminato con successo!",
+                                                "Marker deleted!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         else if (it.state == androidx.work.WorkInfo.State.FAILED)
                                             Toast.makeText(
                                                 requireContext(),
-                                                "Errore durante l'eliminazione del marker.",
+                                                "Error deleting marker",
                                                 Toast.LENGTH_SHORT
                                             ).show()
 
@@ -237,13 +228,11 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
                                 }
                             }
                     }
-                    .setNegativeButton("Annulla", null)
+                    .setNegativeButton("Cancel", null)
                     .show()
             }
         }
     }
-
-    /* ---------------- Edit ---------------- */
 
     private fun setUpEditButton() {
         binding.editButton.setOnClickListener {
@@ -256,12 +245,12 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    /* ---------------- MapView lifecycle ---------------- */
 
     override fun onStart() { super.onStart(); binding.markerDetailMapView.onStart() }
     override fun onResume() { super.onResume(); binding.markerDetailMapView.onResume() }
     override fun onPause() { binding.markerDetailMapView.onPause(); super.onPause() }
     override fun onStop() { binding.markerDetailMapView.onStop(); super.onStop() }
+    @Deprecated("Deprecated in Java")
     override fun onLowMemory() { super.onLowMemory(); binding.markerDetailMapView.onLowMemory() }
 
     override fun onSaveInstanceState(outState: Bundle) {

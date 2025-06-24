@@ -2,13 +2,35 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/material_dynamic_neutral_variant30"
-    android:scrollbarSize="6dp"
-    app:circularflow_radiusInDP="20"
-    tools:context=".EditMarkerFragment">
+    tools:context=".DetailPhotoFragment">
+
+    <Button
+        android:id="@+id/cancelEditFragmentButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/cancel"
+        app:icon="@android:drawable/ic_menu_close_clear_cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/saveEditButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/saveEditButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/save"
+        app:icon="@android:drawable/ic_menu_save"
+        app:layout_constraintBottom_toBottomOf="@+id/cancelEditFragmentButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/cancelEditFragmentButton"
+        app:layout_constraintTop_toTopOf="@+id/cancelEditFragmentButton" />
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/EditMarkerToolBar"
@@ -24,280 +46,15 @@
         app:layout_constraintVertical_bias="0.0"
         app:navigationIcon="?attr/homeAsUpIndicator"
         app:navigationIconTint="@color/white"
-        app:title="Photo Marker"
+        app:title="Edit Photo Marker"
         app:titleTextColor="@color/white" />
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp"
-        android:fillViewport="true"
-        android:scrollIndicators="left"
-        android:scrollbarSize="6dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/cancelEditFragmentButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/CardMapEditView">
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="20dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="16dp"
-                android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:showDividers="middle">
-
-                <!-- Row 1: Name -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="Name:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/namePhotoEditFragmentTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:inputType="text"
-                        android:textColor="@color/white"
-                        android:textColorHint="#B0BEC5" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="Photography genre:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_marginEnd="24dp"
-                        android:background="@color/colorPrimaryDark"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1">
-
-                        <ImageView
-                            android:id="@+id/genreIconEditFragmentImageView"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="1.0"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <Spinner
-                            android:id="@+id/genreEditFragmentSpinner"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/genreIconEditFragmentImageView"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-                </LinearLayout>
-
-                <!-- Row 2: Shutter Speed -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="Shutter Speed:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <Spinner
-                        android:id="@+id/shutterSpeedEditFragmentSpinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:background="@color/colorPrimaryDark"
-                        android:minHeight="48dp" />
-                </LinearLayout>
-
-                <!-- Row 3: F-stop -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="F-stop:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <Spinner
-                        android:id="@+id/fStopEditFragmentSpinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:background="@color/colorPrimaryDark"
-                        android:minHeight="48dp" />
-                </LinearLayout>
-
-                <!-- Row 4: ISO -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="ISO:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <Spinner
-                        android:id="@+id/isoEditFragmentSpinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:background="@color/colorPrimaryDark"
-                        android:minHeight="48dp" />
-                </LinearLayout>
-
-                <!-- Row 5: Focal Length -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="Focal Length:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <EditText
-                        android:id="@+id/focalLengthEditFragmentEditText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:inputType="number"
-                        android:text="35"
-                        android:textColor="@color/white"
-                        android:textColorHint="#E91A1A" />
-                </LinearLayout>
-
-                <!-- Row 6: TAG -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="TAG:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <EditText
-                        android:id="@+id/tagEditFragmentEditText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:hint="TAG"
-                        android:inputType="text"
-                        android:textColor="@color/white" />
-                </LinearLayout>
-
-                <!-- Row 7: Note -->
-                <EditText
-                    android:id="@+id/noteEditFragmentEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:editable="true"
-                    android:hint="Insert note..."
-                    android:inputType="textMultiLine"
-                    android:maxLines="6"
-                    android:minHeight="48dp"
-                    android:scrollbars="vertical"
-                    android:textColor="@color/white"
-                    android:textColorHint="#B0BEC5"
-                    android:textSize="16sp" />
-
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </androidx.core.widget.NestedScrollView>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/CardMapEditView"
         android:layout_width="0dp"
         android:layout_height="250dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="4dp"
         app:cardCornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -312,7 +69,7 @@
                 android:id="@+id/mapViewEditFragment"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:contentDescription="Visualize marker in map"
+                android:contentDescription="@string/visualize_marker_in_map"
                 app:circularflow_radiusInDP="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -356,7 +113,8 @@
                 app:layout_constraintEnd_toEndOf="@+id/mapTypeEditFAB"
                 app:layout_constraintStart_toStartOf="@+id/mapTypeEditFAB"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
-                app:tint="@color/colorOnPrimary" />
+                app:tint="@color/colorOnPrimary"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/rotationEditSlider"
@@ -371,32 +129,289 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/mapViewEditFragment"
                 app:layout_constraintVertical_bias="1.0"
-                app:trackColorInactive="#5F7A81" />
+                app:trackColorInactive="#5F7A81"
+                tools:ignore="SpeakableTextPresentCheck" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <Button
-        android:id="@+id/cancelEditFragmentButton"
+    <androidx.cardview.widget.CardView
         android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="4dp"
-        android:text="Cancel"
-        app:icon="@android:drawable/ic_menu_close_clear_cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/saveEditButton"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/saveEditButton"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:text="Save"
-        app:layout_constraintBottom_toBottomOf="@+id/cancelEditFragmentButton"
-        app:icon="@android:drawable/ic_menu_save"
+        android:layout_height="0dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="8dp"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardCornerRadius="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/cancelEditFragmentButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/cancelEditFragmentButton"
-        app:layout_constraintTop_toTopOf="@+id/cancelEditFragmentButton" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/CardMapEditView"
+        app:layout_constraintVertical_bias="0.0">
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="">
+
+                <Button
+                    android:id="@+id/addPhotoEditButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="@color/colorPrimaryDark"
+                    android:text="@string/add_photos"
+                    android:visibility="gone"
+                    app:icon="@android:drawable/ic_menu_add"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/noteEditFragmentEditText" />
+
+                <EditText
+                    android:id="@+id/noteEditFragmentEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="24dp"
+                    android:ems="10"
+                    android:hint="@string/enter_note"
+                    android:inputType="text"
+                    android:maxLines="6"
+                    android:minHeight="48dp"
+                    android:textColorHint="@color/colortexthint"
+                    android:textSize="16sp"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+                    tools:ignore="Autofill" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/editRecyclerView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="horizontal"
+                    android:scrollbars="horizontal"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="parent" />
+
+                <TableLayout
+                    android:id="@+id/tableLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:measureWithLargestChild="true"
+                    android:paddingTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/textView5"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:text="@string/name"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/nameEditTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:text="TextView"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/textView6"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="0.5"
+                            android:text="@string/photography_genre"
+                            android:textColor="@color/colorOnPrimary"
+                            android:textSize="16sp" />
+
+                        <Spinner
+                            android:id="@+id/genreEditFragmentSpinner"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.4"
+                            android:background="@color/colorPrimaryDark"
+                            android:hapticFeedbackEnabled="true" />
+
+                        <ImageView
+                            android:id="@+id/genreIconEditFragmentImageView"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="0.1"
+                            android:background="@color/colorPrimaryDark"
+                            android:backgroundTint="@color/colorPrimaryDark"
+                            android:contentDescription="@string/photography_genre"
+                            app:srcCompat="@drawable/astro_icon" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:text="@string/shutter_speed"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                        <Spinner
+                            android:id="@+id/shutterSpeedEditFragmentSpinner"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:background="@color/colorPrimaryDark" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:text="@string/f_stop"
+                            android:textColor="@color/colorOnPrimary"
+                            android:textSize="16sp" />
+
+                        <Spinner
+                            android:id="@+id/fStopEditFragmentSpinner"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:background="@color/colorPrimaryDark" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:text="@string/iso"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                        <Spinner
+                            android:id="@+id/isoEditFragmentSpinner"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:background="@color/colorPrimaryDark" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:autofillHints="">
+
+                        <TextView
+
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:text="@string/focal_length"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/focalLengthEditFragmentEditText"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:inputType="text"
+                            android:text="@string/default_focal_length"
+                            android:textSize="16sp"
+                            tools:ignore="Autofill" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:text="@string/tag"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/tagEditFragmentEditText"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:hint="@string/enter_tag"
+                            android:inputType="text"
+                            android:textColorHint="@color/colortexthint"
+                            android:textSize="16sp"
+                            tools:ignore="Autofill" />
+                    </TableRow>
+                </TableLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

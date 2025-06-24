@@ -23,7 +23,7 @@ import java.io.File
 import java.io.IOException
 
 
-/** Sincronizza Room ↔ backend */
+/** sync Room ↔ backend */
 class MarkerSyncWorker(
     appContext: Context,
     params: WorkerParameters
@@ -31,8 +31,8 @@ class MarkerSyncWorker(
 
     companion object {
         /* nomi code WorkManager */
-        const val QUEUE_PERIODIC = "marker_sync_periodic"   // ogni 3 h
-        const val QUEUE_MANUAL   = "marker_sync_manual"     // pulsante Sync / salvataggi
+        const val QUEUE_PERIODIC = "marker_sync_periodic"
+        const val QUEUE_MANUAL   = "marker_sync_manual"
 
         private const val TAG = "MarkerSyncWorker"
         private const val INPUT_IS_MANUAL = "isManual"
@@ -45,7 +45,6 @@ class MarkerSyncWorker(
         val manual = inputData.getBoolean(INPUT_IS_MANUAL, false)
         Log.d(TAG, "Worker started (manual=$manual)")
 
-        /* dipendenze (no DI) */
         val dao  = MarkerDatabase.getDatabase(applicationContext).markerDao()
         val repo = MarkerRepository(dao)
         val api  = RetrofitInstance.api
@@ -66,7 +65,7 @@ class MarkerSyncWorker(
 
             prefs.edit { putLong(lastSyncKey, System.currentTimeMillis()) }
         }.fold(
-            onSuccess = { success("Sync completata con successo", manual) },
+            onSuccess = { success("Sync completed successfully", manual) },
             onFailure = { handleFailure(it, manual) }
         )
     }
@@ -79,10 +78,9 @@ class MarkerSyncWorker(
         val ctx = applicationContext
 
         for (entity0 in repo.getPendingForSync()) {
-            var entity = entity0   // potrà cambiare se otteniamo un nuovo id
+            var entity = entity0
             kotlin.runCatching {
 
-                /* ---- 1) LOCAL_ONLY → crea marker vuoto ---- */
                 if (entity.syncStatus == SyncStatus.LOCAL_ONLY) {
                     val serverId = api.createMarker(entity.toDto().copy(photoIds = emptyList()))
                         .bodyOrThrow()
@@ -102,11 +100,9 @@ class MarkerSyncWorker(
                     }
                 }
 
-                /* ---- 2) upload foto non sincronizzate ---- */
                 val notSynced = entity.photos.filter { !it.synced }
                 if (notSynced.isNotEmpty()) {
 
-                    /* costruisci multipart */
                     val parts = notSynced.map { pr ->
                         val bytes = ctx.contentResolver
                             .openInputStream(pr.localUri!!.toUri())
@@ -118,12 +114,11 @@ class MarkerSyncWorker(
                         )
                         MultipartBody.Part.createFormData(
                             "files",
-                            File(pr.thumbPath).name,   // stesso nome thumb = filename originale
+                            File(pr.thumbPath).name,
                             body
                         )
                     }
 
-                    /* risposta → filename→id */
                     val resp: PhotoUploadResponse =
                         api.uploadPhotos(entity.id, parts).bodyOrThrow()
 
@@ -143,7 +138,6 @@ class MarkerSyncWorker(
                     entity = entity.copy(photos = updatedPhotos)
                 }
 
-                /* ---- 3) PUT finale o DELETE ---- */
                 when (entity.syncStatus) {
                     SyncStatus.LOCAL_ONLY, SyncStatus.DIRTY -> {
                         api.updateMarker(entity.id, entity.toDto()).bodyOrThrow()
@@ -152,7 +146,6 @@ class MarkerSyncWorker(
                     SyncStatus.PENDING_DELETE -> {
                         api.deleteMarker(entity.id).bodyOrThrow()
                         repo.remove(entity.id)
-                        /* cleanup thumbnails dir */
                         File(ctx.filesDir, "thumbnails/${entity.id}").deleteRecursively()
                     }
                     else -> Unit
@@ -160,7 +153,6 @@ class MarkerSyncWorker(
 
             }.onFailure { e ->
                 Log.e(TAG, "Push failed on id=${entity.id}", e)
-                // lo stato rimane invariato: ritenterà
             }
         }
     }
@@ -178,10 +170,9 @@ class MarkerSyncWorker(
                     repo.remove(it)
                     File(applicationContext.filesDir, "thumbnails/$it").deleteRecursively()
                 }
-                Log.d(TAG, "Server says DELETE → id ${dto.id}")
+                Log.d(TAG, "Server DELETE → id ${dto.id}")
             } else {
                 repo.upsert(dto.toEntity())
-                Log.d(TAG, "Upsert da server → id ${dto.id}")
             }
         }
     }
@@ -191,11 +182,11 @@ class MarkerSyncWorker(
         if (manual) Result.success(workDataOf("message" to msg)) else Result.success()
 
     private fun handleFailure(t: Throwable, manual: Boolean): Result {
-        val msg = t.message ?: "Errore sconosciuto"
+        val msg = t.message ?: "Unknown error"
         return if (manual) {
-            Result.failure(workDataOf("errorMessage" to "Sync fallita: $msg"))
+            Result.failure(workDataOf("errorMessage" to "Sync failed: $msg"))
         } else {
-            Result.retry()          // WorkManager gestisce back-off
+            Result.retry()          // WorkManager menages back-off
         }
     }
 

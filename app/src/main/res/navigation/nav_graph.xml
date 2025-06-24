@@ -144,5 +144,8 @@
             app:popUpTo="@id/mapsFragment"
             app:popUpToInclusive="true"
             app:launchSingleTop="true"/>
+        <action
+            android:id="@+id/action_editMarkerFragment_to_cameraFragment"
+            app:destination="@id/cameraFragment" />
     </fragment>
 </navigation>

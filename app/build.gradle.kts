@@ -77,5 +77,6 @@ dependencies {
     implementation (libs.androidx.camera.core)
     implementation (libs.androidx.camera.camera2)
     implementation (libs.androidx.camera.lifecycle)
-    implementation ("androidx.camera:camera-view:1.4.2")
+    implementation (libs.androidx.camera.view)
+    implementation(libs.androidx.gridlayout)
 }
