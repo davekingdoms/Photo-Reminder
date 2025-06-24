@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -27,20 +26,16 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import com.example.photoreminder.data.sync.PhotoSyncWorker
-import com.google.android.datatransport.cct.internal.NetworkConnectionInfo
 import java.util.concurrent.TimeUnit
 
 
+@Suppress("LABEL_NAME_CLASH")
 class LoginFragment : Fragment() {
 
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
     private val loginViewModel: LoginViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -92,18 +87,16 @@ class LoginFragment : Fragment() {
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         if (token != null) {
-                            // Salvo token e username
+
                             DataStoreManager.saveToken(requireContext(), token)
                             DataStoreManager.saveUsername(requireContext(), username)
 
-                            // Reset last_sync_time
                             requireContext()
                                 .getSharedPreferences("marker_sync_prefs", Context.MODE_PRIVATE)
                                 .edit {
                                     putLong("last_sync_time_$username", 0L)
                                 }
 
-                            // Preparo i due WorkRequest
                             val markerReq = OneTimeWorkRequestBuilder<MarkerSyncWorker>()
                                 .setInputData(workDataOf("isManual" to true))
                                 .setConstraints(
@@ -129,7 +122,6 @@ class LoginFragment : Fragment() {
                                 )
                                 .build()
 
-                            // Lancio la catena: marker → foto
                             val wm = WorkManager.getInstance(requireContext())
                             wm.beginUniqueWork(
                                 MarkerSyncWorker.QUEUE_MANUAL,
@@ -139,7 +131,6 @@ class LoginFragment : Fragment() {
                                 .then(photoReq)
                                 .enqueue()
 
-                            // Osservo lo stato della coda unica per dare feedback all'utente
                             wm.getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.QUEUE_MANUAL)
                                 .observe(viewLifecycleOwner) { infos ->
                                     val info = infos.firstOrNull() ?: return@observe
@@ -153,13 +144,11 @@ class LoginFragment : Fragment() {
                                     }
                                 }
 
-                            // Navigo a Home
                             findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                             loginViewModel.clearLoginResponse()
                         }
                     }
                 } else {
-                    // gestione errore login
                     val errorBody = it.errorBody()?.string()
                     Toast.makeText(requireContext(), "Login error: $errorBody", Toast.LENGTH_LONG).show()
                 }

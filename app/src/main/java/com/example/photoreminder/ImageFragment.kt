@@ -1,5 +1,6 @@
 package com.example.photoreminder
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -27,7 +28,6 @@ class ImageFragment : Fragment() {
     private var _binding: FragmentImageBinding? = null
     private val binding get() = _binding!!
 
-    /** File temporaneo creato al download (da eliminare in onDestroyView) */
     private var tmpFile: File? = null
 
     override fun onCreateView(
@@ -50,11 +50,9 @@ class ImageFragment : Fragment() {
         loadImage()
     }
 
-    /** Carica la full-res se possibile, altrimenti la thumbnail locale. */
     private fun loadImage() {
         val thumbUri = Uri.fromFile(File(args.thumbPath))
 
-        /* 1. offline o remoteId mancante → thumbnail immediata */
         if (args.remoteId.isBlank() || !hasNetworkConnection(requireContext())) {
             Glide.with(this)
                 .load(thumbUri)
@@ -63,7 +61,6 @@ class ImageFragment : Fragment() {
             return
         }
 
-        /* 2. online con remoteId → download in cacheDir/photo_tmp */
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.api.downloadPhoto(args.remoteId)
@@ -96,8 +93,7 @@ class ImageFragment : Fragment() {
         }
     }
 
-
-    /** Torna true se il device ha una connessione attiva (Wi-Fi, dati, ethernet). */
+    @SuppressLint("ObsoleteSdkInt")
     private fun hasNetworkConnection(ctx: Context): Boolean {
         val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -112,7 +108,7 @@ class ImageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        tmpFile?.delete()   // pulizia file temporaneo
+        tmpFile?.delete()
         _binding = null
         super.onDestroyView()
     }

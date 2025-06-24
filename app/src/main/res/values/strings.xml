@@ -10,5 +10,24 @@
     <string name="Register">Register</string>
     <string name="photomap">Photo Map</string>
     <string name="photo_list">Photo List</string>
+    <string name="visualize_marker_in_map">Visualize marker in map</string>
+    <string name="name">Name:</string>
+    <string name="add_photos">Add photos</string>
+    <string name="photography_genre">Photography genre:</string>
+    <string name="shutter_speed">Shutter Speed:</string>
+    <string name="f_stop">F-stop:</string>
+    <string name="iso">ISO:</string>
+    <string name="focal_length">Focal Length:</string>
+    <string name="default_focal_length">35</string>
+    <string name="tag">TAG:</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="enter_note">Enter note ...</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="enter_tag">Enter tag ...</string>
+    <string name="map_type_fab">Button for change map type</string>
+    <string name="threeD_fab">Set 3d map</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
 
 </resources>

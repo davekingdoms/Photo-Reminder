@@ -2,7 +2,6 @@ package com.example.photoreminder
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
 import android.util.Log
@@ -12,10 +11,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.photoreminder.data.local.MarkerDatabase
 import com.example.photoreminder.data.local.MarkerEntity
@@ -25,7 +25,6 @@ import com.example.photoreminder.databinding.FragmentMapsBinding
 import com.example.photoreminder.ui.adapter.TagAdapter
 import com.example.photoreminder.ui.viewmodel.MarkerViewModel
 import com.example.photoreminder.ui.viewmodel.MarkerViewModelFactory
-import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -36,6 +35,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
@@ -43,11 +43,11 @@ import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import java.util.Locale
 
+@Suppress("DEPRECATION")
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
-    private val args: MapsFragmentArgs by navArgs()
     private lateinit var googleMap: GoogleMap
     private val fineLocation = android.Manifest.permission.ACCESS_FINE_LOCATION
     private enum class LocationMode { LAST_KNOWN, CURRENT_BALANCED, CURRENT_HIGH }
@@ -56,7 +56,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         LocationServices.getFusedLocationProviderClient(requireContext())
     }
 
-    // ViewModel + Repository
     private val viewModel: MarkerViewModel by viewModels {
         MarkerViewModelFactory(
             MarkerRepository(
@@ -65,14 +64,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         )
     }
 
-    // Manteniamo:
-    //  • allMarkers = lista completa di MarkerEntity in Room
-    //  • selectedTag = tag attualmente usato per filtrare (di default "All")
     private var allMarkers: List<MarkerEntity> = emptyList()
     private var selectedTag: String = "All"
     private lateinit var tagAdapter: TagAdapter
 
-    // Flag per sapere quando la mappa è pronta
     private var mapIsReady: Boolean = false
 
     override fun onCreateView(
@@ -80,7 +75,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
-        // Inizializzo Places se non fatto
+
         if (!Places.isInitialized()) {
             Places.initialize(requireContext().applicationContext, BuildConfig.MAPS_API_KEY)
         }
@@ -90,7 +85,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1) Inizializzo MapView
         binding.mapView.onCreate(savedInstanceState)
         binding.mapView.getMapAsync(this)
         binding.threeDimensionFAB.visibility = View.INVISIBLE
@@ -98,7 +92,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             findNavController().navigateUp()
         }
 
-        // 2) Imposto RecyclerView orizzontale per i tag/ generi
         tagAdapter = TagAdapter(listOf("All"), "All") { tag ->
             selectedTag = tag
             if (mapIsReady) {
@@ -111,7 +104,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             adapter = tagAdapter
         }
 
-        // 3) Preparo Places Autocomplete per la barra di ricerca
         searchLauncher = registerForActivityResult(
             androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -119,7 +111,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 val data = result.data ?: return@registerForActivityResult
                 val place = Autocomplete.getPlaceFromIntent(data)
                 place.latLng?.let { latLng ->
-                    // Nascondo la tastiera
                     val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE)
                             as android.view.inputmethod.InputMethodManager
                     imm.hideSoftInputFromWindow(binding.placesEditText.windowToken, 0)
@@ -154,11 +145,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        // 4) Osserva i marker da Room
         viewModel.markers.observe(viewLifecycleOwner) { list ->
             allMarkers = list.filterNot { it.syncStatus == SyncStatus.PENDING_DELETE }
 
-            // 4a) ricavo tutti i generi e tag unici
             val genres = allMarkers
                 .mapNotNull { it.genre.ifBlank { null } }
                 .map { it.lowercase(Locale.getDefault()) }
@@ -166,18 +155,15 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 allMarkers.mapNotNull { it.tag?.lowercase(Locale.getDefault()) }
             val unique = (genres + tags).toSet().map { it.capitalize(Locale.getDefault()) }
 
-            // Lista "All" + valori unici ordinati
             val displayTags = listOf("All") + unique.sorted()
             tagAdapter.updateTags(displayTags)
 
-            // 4b) disegno marker per il tag corrente solo se la mappa è già pronta
             if (mapIsReady) {
                 drawMarkersOnMap()
             }
         }
     }
 
-    /** Chiamato quando la MapView è pronta */
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         mapIsReady = true
@@ -230,22 +216,20 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(northBearing))
         }
 
-        // Imposto il listener di click sui marker una sola volta
         googleMap.setOnMarkerClickListener { marker ->
             val markerId = marker.tag as? String
             if (markerId != null) {
-                Log.d("MapsFragment", "Navigo a DetailPhoto con id = $markerId")
+                Log.d("MapsFragment", "Navigate to DetailPhoto, id = $markerId")
                 val action = MapsFragmentDirections
                     .actionMapsFragmentToDetailPhotoFragment(markerId)
                 findNavController().navigate(action)
                 true
             } else {
-                Log.d("MapsFragment", "marker.tag è null, id non assegnato")
+                Log.d("MapsFragment", "marker.tag  null, id not found")
                 false
             }
         }
 
-        // Ascolto long-press per aggiungere un marker (nav a AddPhotoMarkerFragment)
         googleMap.setOnMapLongClickListener {
             val action = MapsFragmentDirections
                 .actionMapsFragmentToAddPhotoMarkerFragment(
@@ -253,16 +237,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 )
             findNavController().navigate(action)
         }
-/*
-        args.centerLat?.toDoubleOrNull()?.let { lat ->
-            args.centerLng?.toDoubleOrNull()?.let { lng ->
-                moveCamera(lat, lng, 17f)
-            }
-    }*/
 
-
-
-        // Disegno iniziale dei marker (se già presenti)
         drawMarkersOnMap()
     }
 
@@ -281,7 +256,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         }
 
         toDraw.forEach { m ->
-            // Aggiungo il marker e ne catturo l'oggetto per poter assegnare il tag
+
             val gmMarker = googleMap.addMarker(
                 MarkerOptions()
                     .position(LatLng(m.lat, m.lng))
@@ -289,12 +264,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     .icon(getIconForGenre(m.genre))
                     .anchor(0.5f, 0.5f)
             )
-            // Assegno l'id dell'entità Room come tag
+
             gmMarker?.tag = m.id
         }
     }
 
-    /** Restituisce un BitmapDescriptor ridimensionato (48dp) per il genere */
     private fun getIconForGenre(genre: String?): BitmapDescriptor {
         val resId = when (genre?.lowercase(Locale.getDefault())) {
             "street"     -> R.drawable.street_icon
@@ -311,20 +285,15 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         val targetPx = (48 * resources.displayMetrics.density).toInt()
 
         val drawable = ResourcesCompat.getDrawable(resources, resId, null)!!
-        val rawBmp = Bitmap.createBitmap(
-            drawable.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
+        val rawBmp = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
         val canvas = Canvas(rawBmp)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
 
-        val scaledBmp = Bitmap.createScaledBitmap(rawBmp, targetPx, targetPx, true)
+        val scaledBmp = rawBmp.scale(targetPx, targetPx)
         return BitmapDescriptorFactory.fromBitmap(scaledBmp)
     }
 
-    /* ------------------------- gestori posizione / permesso ------------------------- */
     private fun hasLocationPermission(): Boolean =
         ContextCompat.checkSelfPermission(
             requireContext(),
@@ -334,12 +303,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private fun askLocationPermission() {
         if (shouldShowRequestPermissionRationale(fineLocation)) {
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Posizione necessaria")
-                .setMessage("La tua posizione serve per mostrarti sulla mappa.")
-                .setPositiveButton("Concedi") { _, _ ->
+                .setTitle("Position needed")
+                .setMessage("Your location is needed to show you on the map. Please, allow the permission.")
+                .setPositiveButton("Grant") { _, _ ->
                     requestPermissionLauncher.launch(fineLocation)
                 }
-                .setNegativeButton("Chiudi") { _, _ ->
+                .setNegativeButton("Close") { _, _ ->
                     showFallback()
                 }
                 .show()
@@ -417,6 +386,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() { super.onResume(); binding.mapView.onResume() }
     override fun onPause() { binding.mapView.onPause(); super.onPause() }
     override fun onStop() { binding.mapView.onStop(); super.onStop() }
+    @Deprecated("Deprecated in Java")
     override fun onLowMemory() { super.onLowMemory(); binding.mapView.onLowMemory() }
 
     override fun onSaveInstanceState(outState: Bundle) {

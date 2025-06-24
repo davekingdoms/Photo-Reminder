@@ -9,7 +9,6 @@ import androidx.work.WorkerParameters
 import com.example.photoreminder.data.api.RetrofitInstance
 import com.example.photoreminder.data.datastore.DataStoreManager
 import com.example.photoreminder.data.local.MarkerDatabase
-import com.example.photoreminder.data.model.PhotoRef
 import kotlinx.coroutines.flow.first
 import okhttp3.ResponseBody
 import java.io.File
@@ -25,15 +24,12 @@ class PhotoSyncWorker(
     override suspend fun doWork(): Result {
         val context = applicationContext
 
-        // 1) Recupera l'utente corrente
         val username = DataStoreManager.getUsername(context)
             ?: return Result.failure()
 
-        // 2) Carica tutti i marker per quell'utente
         val dao = MarkerDatabase.getDatabase(context).markerDao()
         val markers = dao.getMarkersByUsername(username).first()
 
-        // 3) Filtra tutti i PhotoRef da processare
         val toProcess = markers.flatMap { marker ->
             marker.photos.filter { ref ->
                 ref.remoteId != null && ref.thumbPath.isBlank()
@@ -41,22 +37,22 @@ class PhotoSyncWorker(
         }
 
         if (toProcess.isEmpty()) {
-            Log.d("PhotoSyncWorker", "Niente da sincronizzare")
+            Log.d("PhotoSyncWorker", "Empty")
             return Result.success()
         }
 
-        // 4) Per ciascuna immagine, scarica e genera thumbnail
+        // For each image -> download and create thumbnail
         toProcess.forEach { (markerId, ref) ->
             try {
                 val resp = RetrofitInstance.api.downloadPhoto(ref.remoteId!!)
                 if (!resp.isSuccessful) {
-                    Log.e("PhotoSyncWorker", "Errore download ${ref.remoteId}: ${resp.code()}")
+                    Log.e("PhotoSyncWorker", "Download error ${ref.remoteId}: ${resp.code()}")
                     return@forEach
                 }
                 val body: ResponseBody = resp.body()!!
                 val inputStream = body.byteStream()
 
-                // 4a) Decodifica e ridimensiona in memoria
+                // Decode and resize
                 val originalBmp = BitmapFactory.decodeStream(inputStream)
                 val targetHpx = (170 * applicationContext.resources.displayMetrics.density).roundToInt()
                 val ratio     = targetHpx.toFloat() / originalBmp.height
@@ -64,7 +60,7 @@ class PhotoSyncWorker(
                 val thumbBmp  = originalBmp.scale(targetW, targetHpx)
                 originalBmp.recycle()
 
-                // 4b) Salva su disco
+                // Save thumbnail
                 val thumbDir = File(context.filesDir, "thumbnails/$markerId").apply { mkdirs() }
                 val outFile = File(thumbDir, "${ref.remoteId}.jpg")
                 FileOutputStream(outFile).use { fos ->
@@ -72,7 +68,7 @@ class PhotoSyncWorker(
                 }
                 thumbBmp.recycle()
 
-                // 4c) Aggiorna Room: cerca il marker, sostituisci il PhotoRef
+                // Update marker
                 val updatedMarker = dao.getMarkerById(markerId)?.let { m ->
                     val updatedPhotos = m.photos.map { p ->
                         if (p.remoteId == ref.remoteId) {
@@ -85,7 +81,7 @@ class PhotoSyncWorker(
                     dao.insert(updatedMarker)
                 }
             } catch (e: Exception) {
-                Log.e("PhotoSyncWorker", "Errore sync foto ${ref.remoteId}", e)
+                Log.e("PhotoSyncWorker", "Error sync ${ref.remoteId}", e)
             }
         }
 

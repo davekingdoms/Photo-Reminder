@@ -24,7 +24,6 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    /* ---------------------------------------------------------------- */
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,17 +36,13 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /* ---------- logout ---------- */
         binding.logoutButton.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 val ctx = requireContext()
-                val username = DataStoreManager.getUsername(ctx)
 
-                // 1) azzera il timestamp lastSync
                 ctx.getSharedPreferences("marker_sync_prefs", Context.MODE_PRIVATE)
                     .edit { remove("last_sync_time_${'$'}username") }
 
-                // 2) cancella credenziali + DB locale
                 DataStoreManager.clearToken(ctx)
                 DataStoreManager.clearUsername(ctx)
                 MarkerDatabase.getDatabase(ctx).markerDao().clearAllMarkers()
@@ -56,18 +51,15 @@ class HomeFragment : Fragment() {
                 File(ctx.filesDir, "thumbnails")
                     .deleteRecursively()
 
-                // 3) annulla i worker
                 WorkManager.getInstance(ctx).apply {
                     cancelUniqueWork(MarkerSyncWorker.QUEUE_MANUAL)
                     cancelUniqueWork(MarkerSyncWorker.QUEUE_PERIODIC)
                 }
 
-                // 4) torna al login
                 findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
             }
         }
 
-        /* ---------- observer sullo stato della sync MANUALE ---------- */
         WorkManager.getInstance(requireContext())
             .getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.QUEUE_MANUAL)
             .observe(viewLifecycleOwner) { infos ->
@@ -82,10 +74,8 @@ class HomeFragment : Fragment() {
                 }
             }
 
-        /* ---------- pulsante Sync manuale ---------- */
         binding.syncButton.setOnClickListener { enqueueManualSync() }
 
-        /* ---------- navigazione ---------- */
         binding.cardViewMap.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_mapsFragment)
         }
@@ -93,8 +83,6 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_homeFragment_to_listPhotoFragment)
         }
     }
-
-    /* ================= helpers ================= */
 
     private fun enqueueManualSync() {
         val ctx = requireContext()
@@ -125,14 +113,12 @@ class HomeFragment : Fragment() {
             )
             .build()
 
-        // serializza i job nella coda MANUAL
         wm.beginUniqueWork(
             MarkerSyncWorker.QUEUE_MANUAL,
             ExistingWorkPolicy.REPLACE,
             markerReq
         ).then(photoReq).enqueue()
 
-        // feedback immediato se è già in RUNNING
         val infos = wm.getWorkInfosForUniqueWork(MarkerSyncWorker.QUEUE_MANUAL).get()
         val alreadyRunning = infos.any { it.state == WorkInfo.State.RUNNING }
         if (alreadyRunning) {

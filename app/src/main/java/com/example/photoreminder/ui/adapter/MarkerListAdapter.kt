@@ -1,5 +1,6 @@
 package com.example.photoreminder.ui.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -18,6 +19,7 @@ class MarkerListAdapter(
 
     inner class MarkerVH(val binding: ItemMarkerListBinding)
         : RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun bind(item: MarkerEntity, pos: Int) = with(binding) {
             numberItem.text      = (pos + 1).toString()
             itemNameTextView.text= item.title
@@ -45,7 +47,7 @@ class MarkerListAdapter(
                 oldItem.id == newItem.id
 
             override fun areContentsTheSame(oldItem: MarkerEntity, newItem: MarkerEntity) =
-                oldItem == newItem          // data-class equality sfrutta tutti i campi
+                oldItem == newItem
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.example.photoreminder
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.*
@@ -36,14 +35,11 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
     private lateinit var photoMarker: Marker
     private var currentMarker: MarkerEntity? = null
 
-    /* --- ViewModel “rapido” (senza DI) --- */
     private val viewModel: MarkerViewModel by lazy {
         val dao = MarkerDatabase.getDatabase(requireContext()).markerDao()
         MarkerViewModelFactory(MarkerRepository(dao))
             .create(MarkerViewModel::class.java)
     }
-
-    /* -------------------------- lifecycle -------------------------- */
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,21 +52,17 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /* toolbar back */
         binding.EditMarkerToolBar.setNavigationOnClickListener { findNavController().navigateUp() }
 
-        /* mappa */
         binding.mapViewEditFragment.onCreate(savedInstanceState)
         binding.mapViewEditFragment.getMapAsync(this)
 
-        /* pulsanti */
         binding.cancelEditFragmentButton.setOnClickListener { findNavController().navigateUp() }
         binding.saveEditButton.setOnClickListener { updateMarker() }
 
         setUpSpinners()
         loadMarker(args.markerId)
 
-        /* ---------- observer unico sul worker ---------- */
         WorkManager.getInstance(requireContext())
             .getWorkInfosForUniqueWorkLiveData(MarkerSyncWorker.QUEUE_MANUAL)
             .observe(viewLifecycleOwner) { infos ->
@@ -82,7 +74,6 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
                     if (!msg.isNullOrBlank())
                         Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
 
-                    /* torna alla mappa centrata sul marker appena editato */
                     WorkManager.getInstance(requireContext()).pruneWork()
                     currentMarker?.let {
                         val action =
@@ -96,8 +87,6 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
                 }
             }
     }
-
-    /* -------------------------- data load -------------------------- */
 
     private fun loadMarker(id: String) {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -115,11 +104,9 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    /* -------------------------- UI helpers ------------------------- */
-
     @SuppressLint("SetTextI18n")
     private fun fillForm(m: MarkerEntity) = with(binding) {
-        namePhotoEditFragmentTextView.text = m.title
+        nameEditTextView.text = m.title
 
         fun Spinner.select(value: String?) {
             val idx = (0 until adapter.count).firstOrNull {
@@ -154,7 +141,6 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        /* icona dinamica genere */
         binding.genreEditFragmentSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(p: AdapterView<*>, v: View?, pos: Int, id: Long) {
@@ -175,12 +161,10 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
             }
     }
 
-    /* ----------------------- salvataggio --------------------------- */
 
     private fun updateMarker() {
         val base = currentMarker ?: return
 
-        /* raccogli valori form */
         val updated = base.copy(
             genre        = binding.genreEditFragmentSpinner.selectedItem as String,
             shutterSpeed = binding.shutterSpeedEditFragmentSpinner.selectedItem as String,
@@ -196,7 +180,6 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
 
         viewModel.updateMarker(updated)
 
-        /* --- enqueue sync serializzata --- */
         val req = OneTimeWorkRequestBuilder<MarkerSyncWorker>()
             .setInputData(workDataOf("isManual" to true))
             .setConstraints(
@@ -215,10 +198,9 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
             req
         )
 
-        Toast.makeText(requireContext(), "Salvato: sincronizzazione avviata", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Saved! Sync started...", Toast.LENGTH_SHORT).show()
     }
 
-    /* --------------------------- MAPPA ----------------------------- */
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map.apply {
@@ -260,23 +242,16 @@ class EditMarkerFragment : Fragment(), OnMapReadyCallback {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(m.lat, m.lng), 20f))
     }
 
-    /* ---------------------- lifecycle mapview ---------------------- */
 
     override fun onResume()  { super.onResume();  binding.mapViewEditFragment.onResume() }
     override fun onPause()   { binding.mapViewEditFragment.onPause();   super.onPause() }
-    // MOVED THIS LINE FROM onDestroy() to onDestroyView()
-    // override fun onDestroy() { binding.mapViewEditFragment.onDestroy(); super.onDestroy() }
+    @Deprecated("Deprecated in Java")
     override fun onLowMemory() { super.onLowMemory(); binding.mapViewEditFragment.onLowMemory() }
 
     override fun onDestroyView() {
-        binding.mapViewEditFragment.onDestroy() // THIS IS THE CHANGE!
+        binding.mapViewEditFragment.onDestroy()
         _binding = null
         super.onDestroyView()
     }
 
-    override fun onDestroy() {
-        // The call to binding.mapViewEditFragment.onDestroy() has been moved
-        // to onDestroyView().
-        super.onDestroy()
-    }
 }

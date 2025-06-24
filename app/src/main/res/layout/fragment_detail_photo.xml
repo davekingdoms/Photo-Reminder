@@ -2,11 +2,35 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout5"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     tools:context=".DetailPhotoFragment">
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/delete"
+        app:icon="@android:drawable/ic_menu_delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/editButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/editButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/edit"
+        app:icon="@android:drawable/ic_menu_edit"
+        app:layout_constraintBottom_toBottomOf="@+id/deleteButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/deleteButton"
+        app:layout_constraintTop_toTopOf="@+id/deleteButton" />
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/detailPhotoMarkerToolBar"
@@ -26,326 +50,359 @@
         app:titleTextColor="@color/white" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/CardMapView"
+
+        android:id="@+id/cardView"
         android:layout_width="0dp"
         android:layout_height="250dp"
-        android:layout_marginTop="4dp"
-        android:background="@color/colorBackground"
-        android:backgroundTint="@color/colorBackground"
-        app:cardBackgroundColor="@color/colorBackground"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
         app:cardCornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/detailPhotoMarkerToolBar">
 
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/markerDetailMapView"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="Visualize marker in map"
-            app:circularflow_radiusInDP="20dp" />
+            android:layout_height="match_parent">
 
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/markerDetailMapView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:contentDescription="@string/visualize_marker_in_map"
+                app:circularflow_radiusInDP="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/mapTypeDetailFAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foregroundTint="@color/colorOnPrimary"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:src="@drawable/layer_basemap_svgrepo_com"
+                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTintMode="add"
+                app:layout_constraintBottom_toBottomOf="@+id/markerDetailMapView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.98"
+                app:layout_constraintStart_toStartOf="@+id/markerDetailMapView"
+                app:layout_constraintTop_toTopOf="@+id/markerDetailMapView"
+                app:layout_constraintVertical_bias="0.98"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                app:tint="@color/colorOnPrimary" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/threeDimensionalDetailFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foregroundTint="@color/colorOnPrimary"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:src="@drawable/cube_alt_2_svgrepo_com"
+                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTintMode="add"
+                app:layout_constraintBottom_toTopOf="@+id/mapTypeDetailFAB"
+                app:layout_constraintEnd_toEndOf="@+id/mapTypeDetailFAB"
+                app:layout_constraintStart_toStartOf="@+id/mapTypeDetailFAB"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                app:tint="@color/colorOnPrimary"
+                tools:ignore="TouchTargetSizeCheck" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <Button
-        android:id="@+id/deleteButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="Delete"
-        app:icon="@android:drawable/ic_menu_delete"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/editButton"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/editButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Edit"
-        app:icon="@android:drawable/ic_menu_edit"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/deleteButton"
-        app:layout_constraintTop_toTopOf="@+id/deleteButton"
-        app:layout_constraintVertical_bias="0.0" />
-
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="8dp"
         app:cardBackgroundColor="@color/colorPrimary"
         app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toTopOf="@+id/deleteButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CardMapView">
+        app:layout_constraintTop_toBottomOf="@+id/cardView"
+        app:layout_constraintVertical_bias="0.0">
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="16dp"
-                android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:showDividers="middle">
+                android:autofillHints="">
 
-                <!-- Row 1: Name -->
-                <LinearLayout
+                <TextView
+                    android:id="@+id/noteEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="24dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:maxLines="6"
+                    android:minHeight="48dp"
+                    android:textColorHint="@color/colortexthint"
+                    android:textSize="16sp"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+                    tools:ignore="Autofill" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/thumbRecyclerView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="horizontal"
+                    android:scrollbars="horizontal"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/noteEditText" />
+
+                <TableLayout
+                    android:id="@+id/tableLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:measureWithLargestChild="true"
+                    android:paddingTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
-                        android:id="@+id/namePhotoTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="Name:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/nameDetailFragmentTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:text="Name"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="Photography genre:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_weight="1">
 
-                        <ImageView
-                            android:id="@+id/genreIconImageView"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="1.0"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                        <TextView
+
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:text="@string/name"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/nameDetailFragmentTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:text="TextView"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="0.5"
+                            android:text="@string/photography_genre"
+                            android:textColor="@color/colorOnPrimary"
+                            android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/genreDetailFragmentTextView"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Genre"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="0.4"
+                            android:text="TextView"
                             android:textColor="@color/white"
-                            android:textSize="16dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/genreIconImageView"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                            android:textSize="16sp" />
 
+                        <ImageView
+                            android:id="@+id/genreIconDetailFragmentImageView"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="0.1"
+                            android:contentDescription="@string/photography_genre"
+                            app:srcCompat="@drawable/astro_icon" />
+                    </TableRow>
 
-                </LinearLayout>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
 
-                <!-- Row 2: Shutter Speed -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                        <TextView
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:text="@string/shutter_speed"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/shutterTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:text="TextView"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:text="@string/f_stop"
+                            android:textColor="@color/colorOnPrimary"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/fStopDetailFragmentTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:text="TextView"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:text="@string/iso"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/isoDetailFragmentTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:text="TextView"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="Shutter Speed:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
+                        android:autofillHints="">
 
-                    <TextView
-                        android:id="@+id/shutterTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:text="Shutter Speed"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-                </LinearLayout>
+                        <TextView
 
-                <!-- Row 3: F-stop -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:text="@string/focal_length"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="F-stop:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
+                        <TextView
+                            android:id="@+id/focalLenDetailFragmentTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:inputType="text"
+                            android:text="TextView"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            tools:ignore="Autofill" />
+                    </TableRow>
 
-                    <TextView
-                        android:id="@+id/fStopDetailFragmentTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:text="F-stop"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
 
-                </LinearLayout>
+                        <TextView
 
-                <!-- Row 4: ISO -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="24dp"
+                            android:layout_weight="1"
+                            android:text="@string/tag"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="ISO:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
+                        <TextView
+                            android:id="@+id/tagDetailFragmentTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="24dp"
+                            android:layout_weight="1"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/isoDetailFragmentTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:text="ISO"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <!-- Row 5: Focal Length -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="Focal Length:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/focalLenDetailFragmentTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:text="35"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <!-- Row 6: TAG -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_weight="1"
-                        android:text="TAG:"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/tagDetailFragmentTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_weight="1"
-                        android:hint="TAG"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <!-- Row 7: Note -->
-                <EditText
-                    android:id="@+id/noteEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:editable="false"
-                    android:inputType="textMultiLine"
-                    android:maxLines="6"
-                    android:minHeight="48dp"
-                    android:scrollbars="vertical"
-                    android:textColor="@color/white"
-                    android:textColorHint="#B0BEC5"
-                    android:textSize="16sp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/thumbRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:scrollbars="horizontal" />
-
-            </LinearLayout>
+                    </TableRow>
+                </TableLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
     </androidx.cardview.widget.CardView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

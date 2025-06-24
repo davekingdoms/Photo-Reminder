@@ -36,17 +36,15 @@ import com.example.photoreminder.data.sync.PhotoSyncWorker
 
 class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
 
-    /* ---------- binding & args ---------- */
+
     private var _binding: FragmentAddPhotoMarkerBinding? = null
     private val binding get() = _binding!!
     private val args: AddPhotoMarkerFragmentArgs by navArgs()
 
-    /* ---------- mappa ---------- */
     private lateinit var latLng: LatLng
     private lateinit var googleMap: GoogleMap
     private lateinit var photoMarker: Marker
 
-    /* ---------- ViewModel ---------- */
     private val viewModel: MarkerViewModel by viewModels {
         MarkerViewModelFactory(
             MarkerRepository(
@@ -55,13 +53,9 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
         )
     }
 
-    /* ---------- id marker OFFLINE già generato ---------- */
     private val markerId: String = UUID.randomUUID().toString()
 
-    /* ---------- lista foto in memoria ---------- */
     private val photoRefs = mutableListOf<PhotoRef>()
-
-    /* ================= lifecycle ================= */
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -73,31 +67,27 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /* Toolbar back */
         binding.addPhotoMarkerToolBar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 
-        /* MAPPA */
         latLng = LatLng(args.lat.toDouble(), args.lng.toDouble())
         binding.mapViewMarker.onCreate(savedInstanceState)
         binding.mapViewMarker.getMapAsync(this)
 
-        /* Spinners */
         setupSpinners()
 
-        /* Ricevo le Uri dal CameraFragment */
         parentFragmentManager.setFragmentResultListener(
             CameraFragment.RESULT_KEY, viewLifecycleOwner
         ) { _, bundle ->
             val uris = bundle.getStringArrayList(CameraFragment.BUNDLE_URIS)
                 ?.map(Uri::parse)
                 ?: return@setFragmentResultListener
-            Log.d("AddPhoto", "Ricevute ${uris.size} uri dal picker: $uris")
+            Log.d("AddPhoto", "Received ${uris.size} uri from picker: $uris")
 
             lifecycleScope.launch {
                 for (u in uris) {
-                    val thumb = createThumbnail(u, markerId)   // usa id specifico, NON più "tmp"
+                    val thumb = createThumbnail(u, markerId)
                     photoRefs += PhotoRef(
                         localUri = u.toString(),
                         thumbPath = thumb,
@@ -105,23 +95,20 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
                     )
                 }
                 Toast.makeText(requireContext(),
-                    "Aggiunte ${uris.size} foto", Toast.LENGTH_SHORT).show()
+                    "Added ${uris.size} photos", Toast.LENGTH_SHORT).show()
             }
         }
 
-        /* Pulsante per aprire CameraFragment */
         binding.addPhotoButton.setOnClickListener {
             val action = AddPhotoMarkerFragmentDirections
                 .actionAddPhotoMarkerFragmentToCameraFragment()
             findNavController().navigate(action)
         }
 
-        /* Salva / annulla */
         binding.saveButton.setOnClickListener { saveMarker() }
         binding.cancelButton.setOnClickListener { findNavController().navigateUp() }
     }
 
-    /* ================= SPINNERS ================= */
     private fun setupSpinners() {
         ArrayAdapter.createFromResource(
             requireContext(), R.array.photography_genre,
@@ -164,12 +151,12 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    /* ================ Salvataggio ================ */
+
     private fun saveMarker() {
         val title = binding.namePhotoEditTextView.text.toString().trim()
         if (title.isBlank()) {
-            binding.namePhotoEditTextView.error = "Required"
-            Toast.makeText(requireContext(), "Name is required", Toast.LENGTH_SHORT).show()
+            binding.namePhotoEditTextView.error = "Name is required"
+            //Toast.makeText(requireContext(), "Name is required", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -203,12 +190,11 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
             viewModel.addMarker(marker)
             enqueueSync()
             Toast.makeText(requireContext(),
-                "Marker salvato; sync avviata", Toast.LENGTH_SHORT).show()
+                "Marker saved; sync started", Toast.LENGTH_SHORT).show()
             findNavController().navigateUp()
         }
     }
 
-    /* ---------- enqueue sync manuale ---------- */
     private fun enqueueSync() {
         val ctx = requireContext()
         val wm = WorkManager.getInstance(ctx)
@@ -239,7 +225,6 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
 
     }
 
-    /* ================= MAPPA ================= */
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20f))
@@ -272,14 +257,11 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    /* ============== Thumbnail helper ============== */
     private suspend fun createThumbnail(uri: Uri, markerId: String): String =
         withContext(Dispatchers.IO) {
 
-            /* ---- new: height in px from 170 dp ---- */
             val targetHpx = (170 * resources.displayMetrics.density).roundToInt()
 
-            /*   keep the rest identical, using targetHpx instead of 200  */
             val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             requireContext().contentResolver.openInputStream(uri)?.use {
                 BitmapFactory.decodeStream(it, null, opts)
@@ -309,6 +291,7 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() { super.onResume(); binding.mapViewMarker.onResume() }
     override fun onPause()  { binding.mapViewMarker.onPause();  super.onPause() }
     override fun onStop()   { binding.mapViewMarker.onStop();   super.onStop() }
+    @Deprecated("Deprecated in Java")
     override fun onLowMemory() { super.onLowMemory(); binding.mapViewMarker.onLowMemory() }
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
