@@ -2,6 +2,7 @@ package com.example.photoreminder
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -33,6 +34,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import androidx.core.graphics.scale
 import com.example.photoreminder.data.sync.PhotoSyncWorker
+import androidx.exifinterface.media.ExifInterface
 
 class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
 
@@ -259,31 +261,56 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
 
     private suspend fun createThumbnail(uri: Uri, markerId: String): String =
         withContext(Dispatchers.IO) {
+            val resolver = requireContext().contentResolver
+            val orientation = resolver.openInputStream(uri)?.use { stream ->
+                ExifInterface(stream).getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL
+                )
+            } ?: ExifInterface.ORIENTATION_NORMAL
 
             val targetHpx = (170 * resources.displayMetrics.density).roundToInt()
 
             val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            requireContext().contentResolver.openInputStream(uri)?.use {
+            resolver.openInputStream(uri)?.use {
                 BitmapFactory.decodeStream(it, null, opts)
             }
             opts.inSampleSize = (opts.outHeight / targetHpx).coerceAtLeast(1)
             opts.inJustDecodeBounds = false
 
-            val bmp = requireContext().contentResolver.openInputStream(uri)?.use {
+            val base = resolver.openInputStream(uri)?.use {
                 BitmapFactory.decodeStream(it, null, opts)
             } ?: error("decode failed")
 
-            val ratio   = targetHpx.toFloat() / bmp.height
-            val widthPx = (bmp.width * ratio).roundToInt()
-            val thumb   = bmp.scale(widthPx, targetHpx)
+            val rotated = rotateBitmap(base, orientation)
+
+            val ratio   = targetHpx.toFloat() / rotated.height
+            val widthPx = (rotated.width * ratio).roundToInt()
+            val thumb   = rotated.scale(widthPx, targetHpx)
 
             val dir  = File(requireContext().filesDir, "thumbnails/$markerId").apply { mkdirs() }
             val file = File(dir, "${UUID.randomUUID()}.jpg")
             FileOutputStream(file).use { thumb.compress(Bitmap.CompressFormat.JPEG, 85, it) }
 
-            bmp.recycle(); if (thumb !== bmp) thumb.recycle()
+            if (rotated !== base) base.recycle()
+            if (thumb !== rotated) rotated.recycle()
+            thumb.recycle()
             file.absolutePath
         }
+
+    private fun rotateBitmap(bmp: Bitmap, orientation: Int): Bitmap {
+        val degrees = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90  -> 90f
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+            else -> 0f
+        }
+        if (degrees == 0f) return bmp
+        val matrix = Matrix().apply { postRotate(degrees) }
+        val rotated = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, matrix, true)
+        if (rotated != bmp) bmp.recycle()
+        return rotated
+    }
 
 
     /* ============ lifecycle MapView ============ */
