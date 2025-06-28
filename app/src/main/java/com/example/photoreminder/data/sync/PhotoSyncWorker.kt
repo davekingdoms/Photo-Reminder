@@ -3,6 +3,7 @@ package com.example.photoreminder.data.sync
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -13,7 +14,9 @@ import kotlinx.coroutines.flow.first
 import okhttp3.ResponseBody
 import java.io.File
 import java.io.FileOutputStream
+import java.io.ByteArrayInputStream
 import androidx.core.graphics.scale
+import androidx.exifinterface.media.ExifInterface
 import kotlin.math.roundToInt
 
 class PhotoSyncWorker(
@@ -50,15 +53,23 @@ class PhotoSyncWorker(
                     return@forEach
                 }
                 val body: ResponseBody = resp.body()!!
-                val inputStream = body.byteStream()
+                val bytes = body.bytes()
 
-                // Decode and resize
-                val originalBmp = BitmapFactory.decodeStream(inputStream)
+                val orientation = ByteArrayInputStream(bytes).use { stream ->
+                    ExifInterface(stream).getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_NORMAL
+                    )
+                }
+
+                val baseBmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                val rotated = rotateBitmap(baseBmp, orientation)
                 val targetHpx = (170 * applicationContext.resources.displayMetrics.density).roundToInt()
-                val ratio     = targetHpx.toFloat() / originalBmp.height
-                val targetW   = (originalBmp.width * ratio).toInt()
-                val thumbBmp  = originalBmp.scale(targetW, targetHpx)
-                originalBmp.recycle()
+                val ratio     = targetHpx.toFloat() / rotated.height
+                val targetW   = (rotated.width * ratio).toInt()
+                val thumbBmp  = rotated.scale(targetW, targetHpx)
+                if (rotated !== baseBmp) baseBmp.recycle()
+                if (thumbBmp !== rotated) rotated.recycle()
 
                 // Save thumbnail
                 val thumbDir = File(context.filesDir, "thumbnails/$markerId").apply { mkdirs() }
@@ -86,5 +97,19 @@ class PhotoSyncWorker(
         }
 
         return Result.success()
+    }
+
+    private fun rotateBitmap(bmp: Bitmap, orientation: Int): Bitmap {
+        val degrees = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90  -> 90f
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+            else -> 0f
+        }
+        if (degrees == 0f) return bmp
+        val matrix = Matrix().apply { postRotate(degrees) }
+        val rotated = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, matrix, true)
+        if (rotated != bmp) bmp.recycle()
+        return rotated
     }
 }
