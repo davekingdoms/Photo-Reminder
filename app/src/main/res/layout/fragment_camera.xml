@@ -19,7 +19,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/quantum_ic_arrow_back_grey600_24"
         app:navigationIconTint="@color/white"
-        app:title="Add Photos" />
+        app:title="Add Photos"
+        app:titleTextColor="@color/white" />
 
 
     <androidx.camera.view.PreviewView

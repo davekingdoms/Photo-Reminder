@@ -12,7 +12,7 @@ import androidx.work.*
 import com.example.photoreminder.data.datastore.DataStoreManager
 import com.example.photoreminder.data.local.MarkerDatabase
 import com.example.photoreminder.data.sync.MarkerSyncWorker
-import com.example.photoreminder.data.sync.PhotoSyncWorker
+import com.example.photoreminder.data.sync.PhotoThumbWorker
 import com.example.photoreminder.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
 import java.io.File
@@ -101,7 +101,7 @@ class HomeFragment : Fragment() {
             )
             .build()
 
-        val photoReq = OneTimeWorkRequestBuilder<PhotoSyncWorker>()
+        val photoReq = OneTimeWorkRequestBuilder<PhotoThumbWorker>()
             .setConstraints(
                 Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)

@@ -144,7 +144,7 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
         tagDetailFragmentTextView.text     = marker.tag
         if (!marker.notes.isNullOrBlank()) {
             noteEditText.visibility = View.VISIBLE
-            noteEditText.text = marker.notes
+            noteEditText.setText(marker.notes)
         }
 
     }
@@ -188,7 +188,7 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
     private fun setUpDeleteButton() {
         binding.deleteButton.setOnClickListener {
             currentMarker?.let { marker ->
-                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogCustom)
                     .setTitle("Delete marker")
                     .setMessage(
                         "Are you sure you want to delete this marker?" +
@@ -233,6 +233,7 @@ class DetailPhotoFragment : Fragment(), OnMapReadyCallback {
             }
         }
     }
+
 
     private fun setUpEditButton() {
         binding.editButton.setOnClickListener {

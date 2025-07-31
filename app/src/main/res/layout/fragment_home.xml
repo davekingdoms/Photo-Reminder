@@ -17,7 +17,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="Photo Reminder" />
+        app:title="Photo Reminder"
+        app:titleTextColor="@color/white" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewMap"

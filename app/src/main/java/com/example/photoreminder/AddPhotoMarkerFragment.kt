@@ -33,7 +33,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import androidx.core.graphics.scale
-import com.example.photoreminder.data.sync.PhotoSyncWorker
+import com.example.photoreminder.data.sync.PhotoThumbWorker
 import androidx.exifinterface.media.ExifInterface
 
 class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
@@ -210,7 +210,7 @@ class AddPhotoMarkerFragment : Fragment(), OnMapReadyCallback {
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
             .build()
 
-        val photoReq = OneTimeWorkRequestBuilder<PhotoSyncWorker>()
+        val photoReq = OneTimeWorkRequestBuilder<PhotoThumbWorker>()
             .setConstraints(
                 Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)

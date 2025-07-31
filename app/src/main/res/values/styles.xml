@@ -14,4 +14,18 @@
         <item name="android:textColorPrimary">@color/white</item>
     </style>
 
+    <style name="AlertDialogCustom"
+        parent="ThemeOverlay.Material3.MaterialAlertDialog">
+
+
+        <item name="android:backgroundTint">@color/colorBackground</item>
+
+
+        <item name="colorOnSurface">@color/colorPrimary</item>
+
+
+        <item name="colorPrimary">@color/colorPrimary</item>
+    </style>
+
+
 </resources>

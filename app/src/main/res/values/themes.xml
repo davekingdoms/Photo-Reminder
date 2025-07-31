@@ -12,7 +12,7 @@
         <!--   <item name="android:windowBackground">@color/colorPrimaryDark</item>-->
            <item name="cardBackgroundColor">@color/colorPrimary</item>
            <item name="android:windowBackground">@drawable/background</item>
-
+        <item name="materialAlertDialogTheme">@style/AlertDialogCustom</item>
        </style>
 
        <style name="Theme.PhotoReminder" parent="Base.Theme.PhotoReminder" />
