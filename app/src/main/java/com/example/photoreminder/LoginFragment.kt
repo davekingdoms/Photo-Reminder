@@ -25,7 +25,7 @@ import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
-import com.example.photoreminder.data.sync.PhotoSyncWorker
+import com.example.photoreminder.data.sync.PhotoThumbWorker
 import java.util.concurrent.TimeUnit
 
 
@@ -110,7 +110,7 @@ class LoginFragment : Fragment() {
                                 )
                                 .build()
 
-                            val photoReq = OneTimeWorkRequestBuilder<PhotoSyncWorker>()
+                            val photoReq = OneTimeWorkRequestBuilder<PhotoThumbWorker>()
                                 .setConstraints(
                                     Constraints.Builder()
                                         .setRequiredNetworkType(NetworkType.CONNECTED)

@@ -13,11 +13,11 @@ import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.appcompat.app.AlertDialog
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.navigation.fragment.findNavController
+import com.example.photoreminder.databinding.FragmentCameraBinding
 import java.io.File
 import java.util.*
 
@@ -28,9 +28,8 @@ class CameraFragment : Fragment() {
         const val BUNDLE_URIS = "uris"
     }
 
-    private lateinit var previewView  : PreviewView
-    private lateinit var captureButton: FloatingActionButton
-    private lateinit var galleryButton: FloatingActionButton
+    private var _binding: FragmentCameraBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var imageCapture: ImageCapture
 
@@ -53,14 +52,12 @@ class CameraFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View =
-        inflater.inflate(R.layout.fragment_camera, container, false)
+    ): View {
+        _binding = FragmentCameraBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        previewView   = view.findViewById(R.id.previewView)
-        captureButton = view.findViewById(R.id.floatingActionButton)
-        galleryButton = view.findViewById(R.id.floatingActionButton2)
-
         when {
             ContextCompat.checkSelfPermission(requireContext(), cameraPermission)
                     == PackageManager.PERMISSION_GRANTED -> startCamera()
@@ -70,9 +67,16 @@ class CameraFragment : Fragment() {
                 requestPermissionLauncher.launch(cameraPermission)
         }
 
-        galleryButton.setOnClickListener { launchPicker() }
+        binding.floatingActionButton2.setOnClickListener { launchPicker() }
+        binding.floatingActionButton.setOnClickListener { takePhoto() }
+        binding.cameraToolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+    }
 
-        captureButton.setOnClickListener { takePhoto() }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun launchPicker() {
@@ -101,11 +105,11 @@ class CameraFragment : Fragment() {
             val provider = provFuture.get()
 
             val preview = Preview.Builder().build().also {
-                it.surfaceProvider = previewView.surfaceProvider
+                it.surfaceProvider = binding.previewView.surfaceProvider
             }
 
             imageCapture = ImageCapture.Builder()
-                .setTargetRotation(previewView.display.rotation)
+                .setTargetRotation(binding.previewView.display.rotation)
                 .build()
 
             provider.unbindAll()
@@ -144,7 +148,7 @@ class CameraFragment : Fragment() {
     }
 
     private fun showPermissionRationale() {
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(),R.style.AlertDialogCustom)
             .setTitle("Camera permission required")
             .setMessage("This app needs camera permission to function")
             .setPositiveButton("OK") { _, _ ->

@@ -144,31 +144,30 @@
                 android:layout_height="wrap_content"
                 android:autofillHints="">
 
-                <TextView
+                <EditText
                     android:id="@+id/noteEditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:layout_marginEnd="24dp"
+                    android:editable="false"
                     android:ems="10"
-                    android:inputType="text"
-                    android:maxLines="6"
-                    android:minHeight="48dp"
-                    android:textColorHint="@color/colortexthint"
+                    android:gravity="start|top"
+                    android:hint="Note..."
+                    android:inputType="textMultiLine"
                     android:textSize="16sp"
                     android:visibility="invisible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tableLayout"
-                    tools:ignore="Autofill" />
+                    app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/thumbRecyclerView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="17dp"
                     android:layout_marginEnd="8dp"
                     android:orientation="horizontal"
                     android:scrollbars="horizontal"

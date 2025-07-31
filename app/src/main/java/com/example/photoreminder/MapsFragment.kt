@@ -302,7 +302,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private fun askLocationPermission() {
         if (shouldShowRequestPermissionRationale(fineLocation)) {
-            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogCustom)
                 .setTitle("Position needed")
                 .setMessage("Your location is needed to show you on the map. Please, allow the permission.")
                 .setPositiveButton("Grant") { _, _ ->
@@ -316,6 +316,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             requestPermissionLauncher.launch(fineLocation)
         }
     }
+
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation(mode: LocationMode) {
@@ -365,7 +366,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 enableMyLocation(LocationMode.CURRENT_BALANCED)
             } else {
                 if (!hasLocationPermission()) {
-                    androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogCustom)
                         .setTitle("Permission needed")
                         .setMessage("Your location is needed to show you on the map. Please, allow the permission from the app settings.")
                         .setPositiveButton("Open Settings") { _, _ ->
@@ -381,6 +382,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+
 
     override fun onStart() { super.onStart(); binding.mapView.onStart() }
     override fun onResume() { super.onResume(); binding.mapView.onResume() }

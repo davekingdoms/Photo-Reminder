@@ -19,7 +19,7 @@ import androidx.core.graphics.scale
 import androidx.exifinterface.media.ExifInterface
 import kotlin.math.roundToInt
 
-class PhotoSyncWorker(
+class PhotoThumbWorker(
     appContext: Context,
     params: WorkerParameters
 ): CoroutineWorker(appContext, params) {
@@ -40,7 +40,7 @@ class PhotoSyncWorker(
         }
 
         if (toProcess.isEmpty()) {
-            Log.d("PhotoSyncWorker", "Empty")
+            Log.d("PhotoThumbWorker", "Empty")
             return Result.success()
         }
 
@@ -49,7 +49,7 @@ class PhotoSyncWorker(
             try {
                 val resp = RetrofitInstance.api.downloadPhoto(ref.remoteId!!)
                 if (!resp.isSuccessful) {
-                    Log.e("PhotoSyncWorker", "Download error ${ref.remoteId}: ${resp.code()}")
+                    Log.e("PhotoThumbWorker", "Download error ${ref.remoteId}: ${resp.code()}")
                     return@forEach
                 }
                 val body: ResponseBody = resp.body()!!
@@ -92,7 +92,7 @@ class PhotoSyncWorker(
                     dao.insert(updatedMarker)
                 }
             } catch (e: Exception) {
-                Log.e("PhotoSyncWorker", "Error sync ${ref.remoteId}", e)
+                Log.e("PhotoThumbWorker", "Error sync ${ref.remoteId}", e)
             }
         }
 
