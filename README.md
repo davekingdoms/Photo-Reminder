@@ -4,7 +4,7 @@ Photo Reminder is an Android application written in Kotlin that lets you store p
 
 This project was created as part of the **Programmazione di sistemi mobili** exam for the Bachelor's degree in **Ingegneria IET** at the University of Parma.
 The backend is available at [Photo-Reminder-Backend](https://github.com/davekingdoms/Photo-Reminder-Backend).
-
+<img width="2266" height="1024" alt="Image" src="https://github.com/user-attachments/assets/3452d730-1fbc-4215-b3de-6a99d83e56f9" />
 ## Features
 
 - User registration and login with token saved via DataStore
@@ -69,6 +69,10 @@ The main source code resides under `app/src/main`:
 - Fragment classes for each screen
 
 ## Screenshots
+![Image](https://github.com/user-attachments/assets/b5694614-5318-4600-a3aa-e4f66f899393)
+![Image](https://github.com/user-attachments/assets/05e3fce3-b3b0-44c1-8a78-473aa25018ad)
+![Image](https://github.com/user-attachments/assets/e6fea7a4-0ce7-49ab-a7d0-5320203d9c91)
+![Image](https://github.com/user-attachments/assets/44217621-4087-46d5-ae53-cb8b6bb5a7e8)
 
-_Add screenshots of the app here if available._
+
 
